@@ -1,0 +1,17 @@
+# Files that should NOT go into the Docker lunchbox.
+# Smaller images build faster, and secrets stay out.
+.git
+.github
+node_modules
+data
+.env
+.env.*
+!.env.example
+tests
+test-results
+playwright-report
+lessons
+bad-examples
+*.md
+Dockerfile
+docker-compose.yml

@@ -1,0 +1,45 @@
+# docker-compose.yml
+# Docker Compose starts our app (and anything else it needs) with ONE command:
+#
+#     docker compose up --build
+#
+# Then open http://localhost:3000 in your browser.
+# Stop it with Ctrl+C. Run "docker compose down" to clean up.
+
+services:
+  app:
+    # Build the image from the Dockerfile in this folder.
+    build: .
+
+    # "Port mapping": door 3000 on YOUR computer leads to door 3000
+    # inside the container.
+    ports:
+      - "3000:3000"
+
+    # Read your private settings from .env, if you made one
+    # (cp .env.example .env). It's fine if it doesn't exist.
+    env_file:
+      - path: .env
+        required: false
+
+    # These settings win over anything in .env.
+    environment:
+      NODE_ENV: production
+      DB_PATH: /app/data/todos.db
+      # We visit http://localhost (plain HTTP, no padlock), and some browsers
+      # throw away "Secure" cookies on plain HTTP. On a real server with
+      # HTTPS, this would be true.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      # Incident drill: BREAK_DATABASE=true docker compose up
+      BREAK_DATABASE: ${BREAK_DATABASE:-false}
+
+    # A "volume" is a storage box that lives OUTSIDE the container,
+    # so your todos survive when the container is rebuilt or restarted.
+    volumes:
+      - todo-data:/app/data
+
+    # If the app crashes, Docker starts it again.
+    restart: unless-stopped
+
+volumes:
+  todo-data:
