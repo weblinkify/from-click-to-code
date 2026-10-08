@@ -14,11 +14,9 @@ const securityHeaders = [
   { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
 ];
 
-// Strict-Transport-Security says "always use HTTPS from now on".
-// It only makes sense once the site really has HTTPS.
-if (process.env.COOKIE_SECURE === 'true') {
-  securityHeaders.push({ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' });
-}
+// (Strict-Transport-Security is added in proxy.js, because whether we
+// have HTTPS is a setting read when the app RUNS. This file is only read
+// when the app is BUILT.)
 
 const nextConfig = {
   // Build a small, self-contained server for Docker (see Dockerfile).

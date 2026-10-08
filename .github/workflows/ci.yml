@@ -7,7 +7,7 @@
 #   push / pull request
 #          |
 #          v
-#   install -> lint -> unit + integration + security tests -> npm audit
+#   install -> lint -> unit + integration + security tests -> build -> npm audit
 #          |
 #          +--> end-to-end tests (real browser)
 #          +--> build the Docker image and check it starts
@@ -52,6 +52,9 @@ jobs:
 
       - name: Security tests
         run: npm run test:security
+
+      - name: Build the Next.js app
+        run: npm run build
 
       - name: Check every lesson links to real files
         run: npm run check:links

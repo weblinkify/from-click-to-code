@@ -3,6 +3,7 @@
 .git
 .github
 node_modules
+.next
 data
 .env
 .env.*
