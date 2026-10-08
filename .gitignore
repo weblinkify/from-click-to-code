@@ -1,0 +1,36 @@
+# ------------------------------------------------------------
+# .gitignore = a list of files Git should NEVER save.
+# Think of it as the "don't pack this" list for a school trip.
+# ------------------------------------------------------------
+
+# Downloaded libraries. Anyone can re-download them with `npm install`.
+node_modules/
+
+# Secrets! Real passwords and keys live here. Never commit them.
+.env
+.env.*
+!.env.example
+
+# The database file. Each computer makes its own.
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Test reports and screenshots made by Playwright.
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Logs and coverage reports
+*.log
+npm-debug.log*
+coverage/
+
+# Computer and editor clutter
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
