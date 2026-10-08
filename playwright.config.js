@@ -30,7 +30,7 @@ export default defineConfig({
       DB_PATH: ':memory:',
       SESSION_SECRET: 'e2e-test-secret',
       BCRYPT_ROUNDS: '4',
-      LOGIN_MAX_ATTEMPTS: '50',
+      LOGIN_MAX_ATTEMPTS: '5',
     },
   },
 });

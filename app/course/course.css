@@ -1,6 +1,6 @@
 /*
   course.css adds the styles used only by the course pages.
-  The basic look (colours, buttons, cards) comes from /style.css.
+  The basic look (colours, buttons, cards) comes from app/globals.css.
 */
 
 .course {
@@ -133,7 +133,7 @@ pre {
 }
 
 /* Header names are long, so let them break at the dashes instead. */
-#header-list td:first-child {
+.headers-table td:first-child {
   white-space: normal;
   font-family: "SF Mono", Menlo, Consolas, monospace;
   font-size: 0.85em;
@@ -255,7 +255,212 @@ pre {
     grid-template-columns: 1fr;
   }
 
+  .request-line {
+    flex-wrap: wrap;
+  }
+
   .experiment {
     padding: 14px;
   }
+}
+
+.lesson-words {
+  flex-grow: 1;
+}
+
+.lesson-star {
+  font-size: 1.6rem;
+}
+
+.finish {
+  text-align: center;
+  background: #e7f6ec;
+  border-color: #8fd1a6;
+  border-style: solid;
+}
+
+.code-link {
+  font-size: 0.9rem;
+}
+
+.status-code {
+  font-weight: bold;
+}
+
+.diagram {
+  font-size: 0.8rem;
+}
+
+/* ---------- request builder (API lesson) ---------- */
+
+.request-line {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.request-line select {
+  padding: 8px;
+  font: inherit;
+  font-weight: bold;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+}
+
+.request-line input {
+  flex-grow: 1;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+
+.request-line button {
+  margin-top: 0;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+}
+
+/* ---------- code review game ---------- */
+
+.code-block {
+  margin: 12px 0;
+  padding: 8px 0;
+  list-style: none;
+  overflow-x: auto;
+  background: #2d2a32;
+  border-radius: 10px;
+}
+
+.code-line-button,
+.code-line-static {
+  display: flex;
+  gap: 12px;
+  /* At least as wide as the box, wider if a line is long (then it scrolls). */
+  width: max-content;
+  min-width: 100%;
+  font-weight: normal;
+  margin: 0;
+  padding: 2px 12px;
+  text-align: left;
+  color: #f5f1e6;
+  background: transparent;
+  border-radius: 0;
+}
+
+.code-line-button:hover {
+  background: #45404d;
+}
+
+.code-line code {
+  padding: 0;
+  color: inherit;
+  white-space: pre;
+  background: transparent;
+}
+
+.line-number {
+  min-width: 1.5em;
+  color: #9b93a8;
+  text-align: right;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85em;
+}
+
+.code-line.is-picked .code-line-button {
+  background: #5a3a3a;
+}
+
+.code-line.is-bug .code-line-button,
+.code-line.is-bug .code-line-static {
+  background: #8a2f2f;
+}
+
+.review-result {
+  margin-top: 16px;
+}
+
+/* ---------- security lab ---------- */
+
+.lab-result {
+  margin: 12px 0;
+  padding: 12px 16px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+}
+
+.lab-result.is-blocked {
+  background: #e7f6ec;
+  border-color: #8fd1a6;
+}
+
+.lab-verdict {
+  margin-top: 0;
+  font-weight: bold;
+}
+
+.lab-preview {
+  padding: 8px 12px;
+  background: #fff;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.guess-list li.is-blocked {
+  color: var(--danger);
+}
+
+/* ---------- incident control room ---------- */
+
+.status-panel {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 16px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+}
+
+.status-panel p {
+  margin: 4px 0;
+}
+
+.status-words {
+  font-weight: bold;
+}
+
+.status-light {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.history-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.history-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.light-green { background: var(--success); }
+.light-red { background: var(--danger); }
+.light-amber { background: #e8a33d; }
+.light-grey { background: #9b93a8; }
+
+.drill-steps li {
+  margin-bottom: 10px;
 }
