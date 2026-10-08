@@ -5,14 +5,23 @@
 //
 // A request travels down this list from top to bottom:
 //
-//   request --> read JSON body --> /todos routes --> not found --> error handler
+//   request --> frontend files --> read JSON body --> /todos routes
+//           --> not found --> error handler
 
+const path = require('node:path');
 const express = require('express');
 const { createTodosRouter } = require('./routes/todos');
 const { notFound, errorHandler } = require('./middleware/error-handler');
 
+// The folder holding index.html, app.js and style.css.
+const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
+
 function createApp({ db }) {
   const app = express();
+
+  // Send the frontend files (HTML, CSS, JS) to the browser as they are.
+  // Visiting "/" gives you index.html.
+  app.use(express.static(FRONTEND_DIR));
 
   // Turn the JSON text in a request into a JavaScript object (req.body).
   // The limit stops someone sending us a giant package.

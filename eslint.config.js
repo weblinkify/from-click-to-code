@@ -16,6 +16,14 @@ const nodeGlobals = {
   clearTimeout: 'readonly',
 };
 
+// Names that the web browser gives frontend files for free.
+const browserGlobals = {
+  window: 'readonly',
+  document: 'readonly',
+  fetch: 'readonly',
+  console: 'readonly',
+};
+
 module.exports = [
   {
     ignores: [
@@ -33,6 +41,13 @@ module.exports = [
       ecmaVersion: 2023,
       sourceType: 'commonjs',
       globals: nodeGlobals,
+    },
+  },
+  {
+    files: ['frontend/**/*.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: browserGlobals,
     },
   },
 ];
