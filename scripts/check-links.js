@@ -3,10 +3,10 @@
 // README) points to a file or folder that really exists.
 // Run it with: npm run check:links
 
-const fs = require('node:fs');
-const path = require('node:path');
+import fs from 'node:fs';
+import path from 'node:path';
 
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(import.meta.dirname, '..');
 const FOLDERS_TO_CHECK = ['lessons', 'bad-examples'];
 const FILES_TO_CHECK = ['README.md', 'CLAUDE.md'];
 

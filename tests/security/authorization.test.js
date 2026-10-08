@@ -1,9 +1,9 @@
 // Authorization = "what are you ALLOWED to do?"
 // Rule: you can only see and change YOUR OWN todos.
 
-const { describe, it, beforeEach } = require('node:test');
-const assert = require('node:assert/strict');
-const { makeTestApp, signUp } = require('../helpers/test-app');
+import { describe, it, beforeEach } from 'node:test';
+import assert from 'node:assert/strict';
+import { makeTestApp, signUp } from '../helpers/test-app.js';
 
 describe('keeping todos private', () => {
   let alice;
@@ -11,9 +11,9 @@ describe('keeping todos private', () => {
   let bobsTodoId;
 
   beforeEach(async () => {
-    const { app } = makeTestApp();
-    alice = await signUp(app, 'alice');
-    bob = await signUp(app, 'bob');
+    makeTestApp();
+    alice = await signUp('alice');
+    bob = await signUp('bob');
     const created = await bob.post('/todos', { text: "Bob's secret plan" });
     bobsTodoId = created.body.todo.id;
   });

@@ -1,7 +1,7 @@
 // The "happy path": the main journey a real person takes through the app.
 // sign up -> log in -> add todo -> complete -> delete
 
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
 
 // Every run gets a new username, so tests never bump into each other.
 function newUsername() {

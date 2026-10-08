@@ -3,11 +3,11 @@
 // our app, exactly like a person would. These are "end-to-end" tests:
 // they test everything at once, from the buttons to the database.
 
-const { defineConfig, devices } = require('@playwright/test');
+import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 3100;
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './tests/e2e',
   // Stop forgetting "test.only" in CI.
   forbidOnly: Boolean(process.env.CI),

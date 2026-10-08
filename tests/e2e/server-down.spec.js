@@ -1,7 +1,7 @@
 // Resilience: what happens when things go wrong?
 // We pretend the server is down by making the browser's requests fail.
 
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
 
 // True for requests to our API (but not for the HTML/CSS/JS files).
 function isApiRequest(url) {

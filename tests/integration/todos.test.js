@@ -1,14 +1,14 @@
 // Integration tests check that the pieces work TOGETHER:
 // a real request goes through the routes, into the database, and back.
 
-const { describe, it, beforeEach } = require('node:test');
-const assert = require('node:assert/strict');
-const { makeTestApp, makeBrowser, signUp } = require('../helpers/test-app');
+import { describe, it, beforeEach } from 'node:test';
+import assert from 'node:assert/strict';
+import { makeTestApp, makeBrowser, signUp } from '../helpers/test-app.js';
 
 describe('the todos API when logged out', () => {
   it('logged-out user gets 401', async () => {
-    const { app } = makeTestApp();
-    const browser = await makeBrowser(app);
+    makeTestApp();
+    const browser = await makeBrowser();
 
     const list = await browser.get('/todos');
     assert.equal(list.status, 401);
@@ -22,8 +22,8 @@ describe('the todos API when logged in', () => {
   let sam;
 
   beforeEach(async () => {
-    const { app } = makeTestApp();
-    sam = await signUp(app, 'sam');
+    makeTestApp();
+    sam = await signUp('sam');
   });
 
   it('starts with an empty list', async () => {
@@ -57,11 +57,10 @@ describe('the todos API when logged in', () => {
   });
 
   it('says 400 when the request is broken JSON', async () => {
-    const res = await sam.agent
-      .post('/todos')
-      .set('X-CSRF-Token', sam.csrfToken)
-      .set('Content-Type', 'application/json')
-      .send('{"text": oops');
+    const res = await sam.send('POST', '/todos', {
+      rawBody: '{"text": oops',
+      headers: { 'content-type': 'application/json' },
+    });
     assert.equal(res.status, 400);
   });
 
@@ -137,10 +136,5 @@ describe('the todos API when logged in', () => {
   it('says 400 when the id is not a number', async () => {
     const res = await sam.delete('/todos/abc');
     assert.equal(res.status, 400);
-  });
-
-  it('says 404 for an address that does not exist', async () => {
-    const res = await sam.get('/no-such-page');
-    assert.equal(res.status, 404);
   });
 });

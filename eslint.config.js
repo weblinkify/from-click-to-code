@@ -2,19 +2,22 @@
 // ESLint is a "spell checker" for code. It spots mistakes like a variable
 // we forgot to use, or one we used but never created.
 
-const js = require('@eslint/js');
+import js from '@eslint/js';
 
-// Names that Node.js gives every backend file for free.
+// Names that Node.js gives server files for free.
 const nodeGlobals = {
-  require: 'readonly',
-  module: 'writable',
   process: 'readonly',
   console: 'readonly',
-  __dirname: 'readonly',
   Buffer: 'readonly',
+  URL: 'readonly',
+  Headers: 'readonly',
+  Request: 'readonly',
+  Response: 'readonly',
   setTimeout: 'readonly',
-  setInterval: 'readonly',
   clearTimeout: 'readonly',
+  setInterval: 'readonly',
+  clearInterval: 'readonly',
+  structuredClone: 'readonly',
 };
 
 // Names that the web browser gives frontend files for free.
@@ -23,42 +26,38 @@ const browserGlobals = {
   document: 'readonly',
   fetch: 'readonly',
   console: 'readonly',
-  Headers: 'readonly',
+  URL: 'readonly',
   URLSearchParams: 'readonly',
+  Headers: 'readonly',
   TextEncoder: 'readonly',
   TextDecoder: 'readonly',
+  CustomEvent: 'readonly',
+  setTimeout: 'readonly',
+  clearTimeout: 'readonly',
+  setInterval: 'readonly',
+  clearInterval: 'readonly',
 };
 
-module.exports = [
+export default [
   {
     ignores: [
       'node_modules/',
+      '.next/',
       'data/',
       'test-results/',
       'playwright-report/',
       'bad-examples/',
+      'next-env.d.ts',
     ],
   },
   js.configs.recommended,
   {
     files: ['**/*.js'],
     languageOptions: {
-      ecmaVersion: 2023,
-      sourceType: 'commonjs',
-      globals: nodeGlobals,
-    },
-  },
-  {
-    files: ['frontend/**/*.js'],
-    languageOptions: {
-      sourceType: 'script',
-      globals: browserGlobals,
-    },
-  },
-  {
-    // Playwright tests run in Node but also send code into the browser.
-    files: ['tests/e2e/**/*.js'],
-    languageOptions: {
+      ecmaVersion: 2024,
+      sourceType: 'module',
+      // JSX is the HTML-looking code inside React components.
+      parserOptions: { ecmaFeatures: { jsx: true } },
       globals: { ...nodeGlobals, ...browserGlobals },
     },
   },

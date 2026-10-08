@@ -1,6 +1,6 @@
-const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
-const { createMetrics } = require('../../backend/metrics');
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { createMetrics } from '../../lib/metrics.js';
 
 describe('the metrics counters', () => {
   it('start at zero', () => {

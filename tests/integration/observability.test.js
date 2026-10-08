@@ -1,8 +1,8 @@
 // Health check, metrics, request IDs and logs.
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
-const { makeTestApp, signUp, makeBrowser } = require('../helpers/test-app');
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { makeTestApp, signUp, makeBrowser } from '../helpers/test-app.js';
 
 describe('the health check', () => {
   it('says "ok" when the database is working', async () => {
@@ -33,19 +33,19 @@ describe('request IDs and logs', () => {
   });
 
   it('never writes passwords into the logs', async () => {
-    const { app, logs } = makeTestApp();
-    await signUp(app, 'sam');
+    const { logs } = makeTestApp();
+    await signUp('sam');
     assert.equal(JSON.stringify(logs).includes('correct-horse-battery'), false);
   });
 });
 
 describe('the metrics page', () => {
   it('counts requests, todos created and failed logins', async () => {
-    const { app } = makeTestApp();
-    const sam = await signUp(app, 'sam');
+    makeTestApp();
+    const sam = await signUp('sam');
     await sam.post('/todos', { text: 'Count me' });
 
-    const stranger = await makeBrowser(app);
+    const stranger = await makeBrowser();
     await stranger.post('/auth/login', { username: 'sam', password: 'wrong-guess' });
 
     const res = await sam.get('/metrics');
