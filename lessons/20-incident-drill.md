@@ -16,8 +16,8 @@ Today we'll break our app **on purpose** and fix it, step by step.
 
 Our app has a special setting, `BREAK_DATABASE=true`. When it's on, every
 database call fails, as if the database had suddenly disappeared. Find it in
-[`backend/db/database.js`](../backend/db/database.js) (`checkDatabaseIsWorking`)
-and [`backend/config.js`](../backend/config.js).
+[`lib/db/database.js`](../lib/db/database.js) (`checkDatabaseIsWorking`)
+and [`lib/config.js`](../lib/config.js).
 
 > 🧑‍🏫 **Grown-ups:** for the full experience, one person breaks the app
 > secretly while the learner is the "on-call engineer" who has to work out
@@ -37,15 +37,19 @@ Check the pulse: http://localhost:3000/health says `{"status":"ok"}` ✅
 
 ## Step 1 · 💥 Break it (the "outage")
 
+📟 **Tip:** open the app's live dashboard at
+**http://localhost:3000/course/incident** in another tab before you start.
+You'll watch the light turn red, then green again!
+
 Stop the app (Ctrl+C) and start it again with the drill switch on:
 
 ```bash
-BREAK_DATABASE=true docker compose up        # or: BREAK_DATABASE=true npm start
+BREAK_DATABASE=true docker compose up        # or: BREAK_DATABASE=true npm run dev
 ```
 
 ## Step 2 · 🔎 Detect: how do we *know* something's wrong?
 
-Go back to http://localhost:3000/todos.html and refresh. You should see:
+Go back to http://localhost:3000/my-todos and refresh. You should see:
 
 > *Something went wrong on our side. Please try again. (Help code: 3da69b08)*
 
@@ -89,7 +93,7 @@ The log says `SQLITE_CANTOPEN` (the database can't be opened) and tells us
 why: `BREAK_DATABASE=true`. Let's find where that comes from:
 
 ```bash
-grep -rn "BREAK_DATABASE" backend/
+grep -rn "BREAK_DATABASE" lib/
 ```
 
 Also look at the very first log lines from when the app started. There's a
@@ -113,7 +117,7 @@ a code change that just went out. Let's practise that (on a branch!):
 git switch -c drill-bad-deploy
 
 # Make the "bad change": switch the drill on by default.
-# In backend/config.js, change:
+# In lib/config.js, change:
 #     breakDatabase: readBoolean(env.BREAK_DATABASE, false),
 # to:
 #     breakDatabase: readBoolean(env.BREAK_DATABASE, true),
@@ -145,9 +149,9 @@ Create `tests/unit/config.test.js` with a test called
 <details><summary>Show a solution</summary>
 
 ```js
-const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
-const { readConfig } = require('../../backend/config');
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { readConfig } from '../../lib/config.js';
 
 describe('the settings', () => {
   it('the database is not broken unless someone asks for it', () => {

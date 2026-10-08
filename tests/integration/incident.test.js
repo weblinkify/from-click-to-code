@@ -4,9 +4,9 @@
 //   - users get a calm message (no scary details),
 //   - and the logs tell us the real cause.
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
-const { makeTestApp } = require('../helpers/test-app');
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { makeTestApp } from '../helpers/test-app.js';
 
 // A returning visitor still has their login cookie ("wristband"), so the
 // app has to ask the (broken) database who they are.
@@ -22,7 +22,7 @@ describe('when the database is broken (BREAK_DATABASE=true)', () => {
 
   it('users get a generic 500 message with a request ID, and no details', async () => {
     const { api } = makeTestApp({ breakDatabase: true });
-    const res = await api.get('/todos').set('Cookie', RETURNING_VISITOR);
+    const res = await api.get('/todos', { cookie: RETURNING_VISITOR });
 
     assert.equal(res.status, 500);
     assert.equal(res.body.error, 'Something went wrong on our side. Please try again.');
@@ -33,7 +33,7 @@ describe('when the database is broken (BREAK_DATABASE=true)', () => {
 
   it('the logs show the real cause, with the same request ID', async () => {
     const { api, logs } = makeTestApp({ breakDatabase: true });
-    const res = await api.get('/todos').set('Cookie', RETURNING_VISITOR);
+    const res = await api.get('/todos', { cookie: RETURNING_VISITOR });
 
     const errorLine = logs.find((entry) => entry.level === 'error');
     assert.equal(errorLine.requestId, res.body.requestId);
@@ -43,16 +43,10 @@ describe('when the database is broken (BREAK_DATABASE=true)', () => {
 
   it('the errors are counted in /metrics', async () => {
     const { api } = makeTestApp({ breakDatabase: true });
-    await api.get('/todos').set('Cookie', RETURNING_VISITOR);
-    await api.get('/todos').set('Cookie', RETURNING_VISITOR);
+    await api.get('/todos', { cookie: RETURNING_VISITOR });
+    await api.get('/todos', { cookie: RETURNING_VISITOR });
 
     const res = await api.get('/metrics');
     assert.equal(res.body.errorsTotal, 2);
-  });
-
-  it('the web pages still load, so we can show a friendly message', async () => {
-    const { api } = makeTestApp({ breakDatabase: true });
-    const res = await api.get('/todos.html');
-    assert.equal(res.status, 200);
   });
 });

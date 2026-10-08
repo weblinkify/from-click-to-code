@@ -1,13 +1,13 @@
 // Tests for signing up, logging in and logging out.
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
-const { makeTestApp, makeBrowser, signUp, TEST_PASSWORD } = require('../helpers/test-app');
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { makeTestApp, makeBrowser, signUp, TEST_PASSWORD } from '../helpers/test-app.js';
 
 describe('signing up', () => {
   it('a new user can sign up and is logged in straight away', async () => {
-    const { app } = makeTestApp();
-    const browser = await makeBrowser(app);
+    makeTestApp();
+    const browser = await makeBrowser();
 
     const res = await browser.post('/auth/signup', { username: 'sam', password: TEST_PASSWORD });
     assert.equal(res.status, 201);
@@ -19,31 +19,31 @@ describe('signing up', () => {
   });
 
   it('never sends the password hash back', async () => {
-    const { app } = makeTestApp();
-    const browser = await makeBrowser(app);
+    makeTestApp();
+    const browser = await makeBrowser();
     const res = await browser.post('/auth/signup', { username: 'sam', password: TEST_PASSWORD });
     assert.deepEqual(Object.keys(res.body.user).sort(), ['id', 'username']);
   });
 
   it('says 409 when the username is already taken', async () => {
-    const { app } = makeTestApp();
-    await signUp(app, 'sam');
-    const browser = await makeBrowser(app);
+    makeTestApp();
+    await signUp('sam');
+    const browser = await makeBrowser();
 
     const res = await browser.post('/auth/signup', { username: 'SAM', password: TEST_PASSWORD });
     assert.equal(res.status, 409);
   });
 
   it('says 400 when the password is too short', async () => {
-    const { app } = makeTestApp();
-    const browser = await makeBrowser(app);
+    makeTestApp();
+    const browser = await makeBrowser();
     const res = await browser.post('/auth/signup', { username: 'sam', password: 'short' });
     assert.equal(res.status, 400);
   });
 
   it('says 400 when the username has spaces in it', async () => {
-    const { app } = makeTestApp();
-    const browser = await makeBrowser(app);
+    makeTestApp();
+    const browser = await makeBrowser();
     const res = await browser.post('/auth/signup', { username: 'sam smith', password: TEST_PASSWORD });
     assert.equal(res.status, 400);
   });
@@ -51,9 +51,9 @@ describe('signing up', () => {
 
 describe('logging in and out', () => {
   it('logs in with the right password', async () => {
-    const { app } = makeTestApp();
-    await signUp(app, 'sam');
-    const browser = await makeBrowser(app);
+    makeTestApp();
+    await signUp('sam');
+    const browser = await makeBrowser();
 
     const res = await browser.post('/auth/login', { username: 'sam', password: TEST_PASSWORD });
     assert.equal(res.status, 200);
@@ -61,18 +61,18 @@ describe('logging in and out', () => {
   });
 
   it('says 401 for a wrong password', async () => {
-    const { app } = makeTestApp();
-    await signUp(app, 'sam');
-    const browser = await makeBrowser(app);
+    makeTestApp();
+    await signUp('sam');
+    const browser = await makeBrowser();
 
     const res = await browser.post('/auth/login', { username: 'sam', password: 'wrong-password' });
     assert.equal(res.status, 401);
   });
 
   it('gives the same message for an unknown user and a wrong password', async () => {
-    const { app } = makeTestApp();
-    await signUp(app, 'sam');
-    const browser = await makeBrowser(app);
+    makeTestApp();
+    await signUp('sam');
+    const browser = await makeBrowser();
 
     const wrongPassword = await browser.post('/auth/login', { username: 'sam', password: 'nope-nope' });
     const unknownUser = await browser.post('/auth/login', { username: 'nobody', password: 'nope-nope' });
@@ -81,8 +81,8 @@ describe('logging in and out', () => {
   });
 
   it('after logging out, the todos are locked again', async () => {
-    const { app } = makeTestApp();
-    const sam = await signUp(app, 'sam');
+    makeTestApp();
+    const sam = await signUp('sam');
 
     const res = await sam.post('/auth/logout');
     assert.equal(res.status, 200);

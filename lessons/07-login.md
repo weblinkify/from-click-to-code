@@ -44,8 +44,9 @@ We use **bcrypt**, which is slow *on purpose* (so guessing millions of
 passwords takes forever) and adds a random **salt** (so two people with the
 same password get different hashes).
 
-👉 See `bcrypt.hash` and `bcrypt.compare` in [`backend/routes/auth.js`](../backend/routes/auth.js),
-and the `password_hash` column in [`backend/db/schema.sql`](../backend/db/schema.sql).
+👉 See `bcrypt.hash` in [`app/auth/signup/route.js`](../app/auth/signup/route.js),
+`bcrypt.compare` in [`app/auth/login/route.js`](../app/auth/login/route.js),
+and the `password_hash` column in [`lib/db/schema.sql`](../lib/db/schema.sql).
 
 ## Part 2: The wristband (session)
 
@@ -53,7 +54,7 @@ After a good login we make a **session**: a very long random number that's
 impossible to guess. It goes in the `sessions` table *and* in a **cookie**, a
 small note the browser keeps and sends back on every visit.
 
-👉 See [`backend/middleware/sessions.js`](../backend/middleware/sessions.js).
+👉 See [`lib/sessions.js`](../lib/sessions.js).
 The cookie has three safety settings:
 
 | Setting | What it does |

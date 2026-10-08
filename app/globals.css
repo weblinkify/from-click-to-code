@@ -1,0 +1,34 @@
+/*
+  globals.css: the styles for every page.
+
+  We use Tailwind CSS. Instead of writing CSS rules in this file, we put
+  small "utility" class names right on each element, like:
+
+    <button className="rounded-lg bg-blue-600 px-4 py-2 font-bold text-white">
+
+  which means: rounded corners, a blue background, some padding, bold
+  white text. Tailwind reads every file in the project and creates the CSS
+  for exactly the classes we used. Nothing more.
+
+  HTML is the skeleton, CSS is the clothes, JavaScript is the muscles.
+*/
+
+@import "tailwindcss";
+
+/* Our own names for the fonts, used as font-sans and font-mono. */
+@theme {
+  --font-sans: ui-rounded, "SF Pro Rounded", "Nunito", "Trebuchet MS", system-ui, sans-serif;
+  --font-mono: "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* A few base styles Tailwind doesn't set for us. */
+@layer base {
+  body {
+    @apply bg-slate-50 font-sans text-slate-800 antialiased;
+  }
+
+  /* A clear ring around whatever the keyboard is on, for keyboard users. */
+  :focus-visible {
+    @apply outline-3 outline-offset-2 outline-blue-500;
+  }
+}

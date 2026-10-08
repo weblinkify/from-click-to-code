@@ -9,6 +9,8 @@
 services:
   app:
     # Build the image from the Dockerfile in this folder.
+    # (The first build takes a few minutes: it installs libraries and
+    # runs "next build".)
     build: .
 
     # "Port mapping": door 3000 on YOUR computer leads to door 3000

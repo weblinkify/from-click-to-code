@@ -2,14 +2,14 @@
 // hoping the app will run them. Because we use "?" placeholders, the
 // database treats their words as plain text. Nothing gets run.
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
-const { makeTestApp, makeBrowser, signUp, TEST_PASSWORD } = require('../helpers/test-app');
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { makeTestApp, makeBrowser, signUp, TEST_PASSWORD } from '../helpers/test-app.js';
 
 describe('SQL-looking input', () => {
   it('SQL-looking input is stored as plain text', async () => {
-    const { app } = makeTestApp();
-    const sam = await signUp(app, 'sam');
+    makeTestApp();
+    const sam = await signUp('sam');
     const sqlLookingText = "Robert'); DROP TABLE todos;--";
 
     const created = await sam.post('/todos', { text: sqlLookingText });
@@ -21,9 +21,9 @@ describe('SQL-looking input', () => {
   });
 
   it("a sneaky ' OR '1'='1 username does not log anyone in", async () => {
-    const { app } = makeTestApp();
-    await signUp(app, 'sam');
-    const browser = await makeBrowser(app);
+    makeTestApp();
+    await signUp('sam');
+    const browser = await makeBrowser();
 
     const res = await browser.post('/auth/login', {
       username: "sam' OR '1'='1",
@@ -33,8 +33,8 @@ describe('SQL-looking input', () => {
   });
 
   it('a filter like ?completed=1 OR 1=1 is rejected', async () => {
-    const { app } = makeTestApp();
-    const sam = await signUp(app, 'sam');
+    makeTestApp();
+    const sam = await signUp('sam');
     const res = await sam.get('/todos?completed=1%20OR%201=1');
     assert.equal(res.status, 400);
   });

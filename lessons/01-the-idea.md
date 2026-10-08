@@ -49,7 +49,7 @@ No colours to pick, no sharing, no reminders. Those could come later!
 
 - [`README.md`](../README.md): the first thing anyone sees. It says what the
   app is in one sentence.
-- [`frontend/index.html`](../frontend/index.html): the welcome page, which
+- [`app/(site)/page.js`](../app/%28site%29/page.js): the welcome page, which
   explains the idea in three steps.
 
 ## New words

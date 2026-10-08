@@ -17,19 +17,22 @@ The most important trick: **follow anything a user types** and see where it ends
   user types "Feed the cat"
         │
         ▼
-  frontend/app.js ── fetch ──> backend/routes/todos.js
+  app/(site)/my-todos/page.js ── fetch ──> app/todos/route.js
                                    │
                                    ├─ validation.js   checked? (length, type) ✅
                                    │
                                    ├─ database.js     glued into SQL? or "?" ✅
                                    │                  owner checked?          ✅
                                    ▼
-  frontend/app.js <── JSON ── answer
+  app/(site)/my-todos/page.js <── JSON ── answer
         │
-        └─ shown with textContent (safe) or innerHTML (danger)? ✅
+        └─ shown as {text} by React (safe) or dangerouslySetInnerHTML (danger)? ✅
 ```
 
 At every arrow, ask: *could a sneaky value cause trouble here?*
+
+🧪 **Try the tricks safely** in the app's security lab:
+**http://localhost:3000/course/security-review**.
 
 ## Practise on the bad examples
 
@@ -46,14 +49,14 @@ the explanation:
 
 ## Our security review checklist
 
-- [ ] Every SQL query uses `?` placeholders → [`database.js`](../backend/db/database.js)
-- [ ] Every todo query checks `user_id` → [`database.js`](../backend/db/database.js)
-- [ ] User text is shown with `textContent` → [`app.js`](../frontend/app.js)
-- [ ] Input is validated on the **backend** → [`validation.js`](../backend/validation.js)
-- [ ] Passwords are hashed → [`routes/auth.js`](../backend/routes/auth.js)
-- [ ] Changes need the CSRF token → [`middleware/csrf.js`](../backend/middleware/csrf.js)
+- [ ] Every SQL query uses `?` placeholders → [`database.js`](../lib/db/database.js)
+- [ ] Every todo query checks `user_id` → [`database.js`](../lib/db/database.js)
+- [ ] User text is shown as plain text (no `dangerouslySetInnerHTML`) → [`TodoItem.js`](../components/TodoItem.js)
+- [ ] Input is validated on the **backend** → [`lib/validation.js`](../lib/validation.js)
+- [ ] Passwords are hashed → [`app/auth/signup/route.js`](../app/auth/signup/route.js)
+- [ ] Changes need the CSRF token → [`lib/csrf.js`](../lib/csrf.js)
 - [ ] No secrets in the code → [`.env.example`](../.env.example)
-- [ ] Errors don't reveal details → [`middleware/error-handler.js`](../backend/middleware/error-handler.js)
+- [ ] Errors don't reveal details → [`lib/api.js`](../lib/api.js)
 
 And the best part: we turned these into **tests**, so a robot re-checks them
 on every change. See [`tests/security/`](../tests/security).

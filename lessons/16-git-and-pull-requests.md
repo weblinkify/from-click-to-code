@@ -16,17 +16,27 @@ git log --oneline
 ```
 
 ```
-  ● Phase 7: lessons and the finished README
-  ● Phase 6: bad-examples folder for code review practice
-  ● Phase 5: Docker image, docker compose and GitHub Actions CI
-  ● Phase 4: logs, metrics, health check and the BREAK_DATABASE drill
-  ● Phase 3: accounts, sessions, CSRF and private todos
-  ● Phase 2: frontend pages (HTML, CSS, vanilla JS)
-  ● Phase 1: database and todos API with tests
+  ● R5: lessons, README and a Coursera-style course player   ┐
+  ● R4: standalone Docker image, CI build step ...            │ Chapter 2:
+  ● R3: an interactive learning hub inside the app            │ rebuilt with
+  ● R2: React pages, components and a nonce-based CSP         │ Next.js + React
+  ● R1: move the backend to Next.js route handlers            ┘
+  ● Add interactive in-browser course ...       🏷️ v1-plain-html
+  ● Phase 7: lessons and the finished README                  ┐
+  ● Phase 6: bad-examples folder for code review practice     │ Chapter 1:
+  ● Phase 5: Docker image, docker compose and GitHub Actions  │ plain HTML,
+  ● Phase 4: logs, metrics, health check and the drill        │ CSS, JavaScript
+  ● Phase 3: accounts, sessions, CSRF and private todos       │ and Express
+  ● Phase 2: frontend pages (HTML, CSS, vanilla JS)           │
+  ● Phase 1: database and todos API with tests                ┘
   ● Start the project: add .gitignore and README
 ```
 
 Read it from the bottom up and you can follow the whole story of the app!
+It has two chapters: first we built it with plain HTML and JavaScript, then
+we rebuilt it with Next.js and React. The 🏷️ is a **tag**, a name stuck on
+one commit so we can always find it again. Try
+`git show v1-plain-html:frontend/app.js` to read the old version!
 
 ## Branches: trying things safely
 
@@ -98,8 +108,8 @@ In a terminal in this project:
 3. Make a branch and a change of your own:
    ```bash
    git switch -c my-first-change
-   # edit the welcome text in frontend/index.html
-   git add frontend/index.html
+   # edit the welcome text in app/(site)/page.js
+   git add "app/(site)/page.js"
    git commit -m "Make the welcome message more exciting"
    git log --oneline -3
    ```

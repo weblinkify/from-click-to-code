@@ -41,6 +41,8 @@ Each test name says what *should* happen, in plain words:
 | Security | *"login is rate limited after too many tries"* | [`tests/security/rate-limit.test.js`](../tests/security/rate-limit.test.js) |
 | E2E | *"a kid can sign up, log in, add a todo, complete it and delete it"* | [`tests/e2e/happy-path.spec.js`](../tests/e2e/happy-path.spec.js) |
 | Resilience | *"frontend shows a friendly message when the server is down"* | [`tests/e2e/server-down.spec.js`](../tests/e2e/server-down.spec.js) |
+| Security (E2E) | *"pages carry a Content-Security-Policy with a fresh nonce each visit"* | [`tests/e2e/security-headers.spec.js`](../tests/e2e/security-headers.spec.js) |
+| Course (E2E) | *"security lab: every trick is blocked"* | [`tests/e2e/course.spec.js`](../tests/e2e/course.spec.js) |
 
 ## How a test is built
 
@@ -56,6 +58,13 @@ it('rejects an empty todo', () => {
 
 Each test gets a **fresh, empty database**, so tests never mess each other
 up. See `makeTestApp` in [`tests/helpers/test-app.js`](../tests/helpers/test-app.js).
+
+There's a neat trick in that helper: a **pretend browser**. It hands requests
+straight to our route files (like `app/todos/route.js`), exactly as Next.js
+would, and remembers cookies between requests like a real browser. That way
+hundreds of checks run in a couple of seconds, without starting a server.
+The end-to-end tests then start the *real* app and use a *real* browser, to
+prove everything also works together.
 
 ## Running the tests
 

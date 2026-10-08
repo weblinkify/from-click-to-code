@@ -59,7 +59,8 @@ Bonus: bcrypt adds a random **salt**, so two people with the same password get
 different hashes. And it's *slow on purpose*, so guessing millions of passwords
 takes far too long.
 
-👉 See the real code: [`backend/routes/auth.js`](../backend/routes/auth.js).
+👉 See the real code: [`app/auth/signup/route.js`](../app/auth/signup/route.js)
+(hashing) and [`app/auth/login/route.js`](../app/auth/login/route.js) (checking).
 Test: [`tests/security/passwords.test.js`](../tests/security/passwords.test.js).
 
 **Review rule:** a column called `password` (not `password_hash`) is a red flag.

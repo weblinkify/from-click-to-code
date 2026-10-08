@@ -12,8 +12,8 @@ breaks, you swap just that brick.
    One giant blob 😵                     Small bricks 😊
 
   ┌───────────────────────┐           ┌──────────┐ ┌──────────────┐ ┌──────────┐
-  │ check text, check id, │           │ validate │ │ routes/      │ │ database │
-  │ check login, talk to  │    ──>    │ TodoText │→│ todos.js     │→│ .js      │
+  │ check text, check id, │           │ validate │ │ app/todos/   │ │ database │
+  │ check login, talk to  │    ──>    │ TodoText │→│ route.js     │→│ .js      │
   │ the database, send    │           │          │ │              │ │          │
   │ answer, handle errors │           └──────────┘ └──────────────┘ └──────────┘
   │ ...all in one place   │           each does ONE job, with a clear name
@@ -29,17 +29,18 @@ function doIt(a, b) { ... }                  // 😕 do what? what's a?
 function validateTodoText(input) { ... }     // 😊 oh, it checks todo text!
 ```
 
-**2. One job per function.** [`backend/validation.js`](../backend/validation.js)
-only checks input. [`backend/db/database.js`](../backend/db/database.js) only
+**2. One job per function.** [`lib/validation.js`](../lib/validation.js)
+only checks input. [`lib/db/database.js`](../lib/db/database.js) only
 talks to the database. The routes in
-[`backend/routes/todos.js`](../backend/routes/todos.js) connect them.
+[`app/todos/route.js`](../app/todos/route.js) connect them.
 
-**3. Small files.** Each middleware has its own file in
-[`backend/middleware/`](../backend/middleware). You can read any one of them
+**3. Small files.** Each helper has its own file in [`lib/`](../lib), and each
+piece of the screen is its own component in [`components/`](../components).
+You can read any one of them
 in a couple of minutes.
 
-**4. Comments that explain *why*.** Open [`backend/routes/todos.js`](../backend/routes/todos.js)
-or [`frontend/app.js`](../frontend/app.js): nearly every line has a short,
+**4. Comments that explain *why*.** Open [`app/todos/route.js`](../app/todos/route.js)
+or [`app/(site)/my-todos/page.js`](../app/%28site%29/my-todos/page.js): nearly every line has a short,
 plain comment. In everyday projects people comment less, but always explain
 anything surprising.
 
@@ -83,7 +84,7 @@ like a variable you forgot to use. Ours is ESLint, set up in
 
 ## 🛠️ Mini challenge
 
-1. Open [`backend/validation.js`](../backend/validation.js) and change
+1. Open [`lib/validation.js`](../lib/validation.js) and change
    `MAX_TODO_LENGTH` from `200` to `20`. Save. (If you used `npm run dev`, the
    server restarts by itself.)
 2. In the app, try adding a todo with 25 letters. What happens?

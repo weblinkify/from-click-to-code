@@ -1,14 +1,14 @@
 // Unit tests check ONE small piece on its own, like testing a single
 // Lego brick before building the whole castle.
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
-const {
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import {
   validateTodoText,
   validateCompleted,
   validateTodoId,
   validateCompletedFilter,
-} = require('../../backend/validation');
+} from '../../lib/validation.js';
 
 describe('checking todo text', () => {
   it('rejects an empty todo', () => {

@@ -1,6 +1,6 @@
-const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
-const { createLogger } = require('../../backend/logger');
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { createLogger } from '../../lib/logger.js';
 
 describe('the logger', () => {
   it('writes one JSON line per message, with time and level', () => {

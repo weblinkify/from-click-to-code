@@ -53,7 +53,7 @@ program that checks the rule automatically. (More in [Lesson 13](13-testing.md).
 
 ## Where requirements live in this project
 
-- [`backend/validation.js`](../backend/validation.js): the "1 to 200
+- [`lib/validation.js`](../lib/validation.js): the "1 to 200
   characters, trimmed" rule turned into code (`validateTodoText`).
 - [`tests/unit/validation.test.js`](../tests/unit/validation.test.js): the
   tests named after the criteria, like *"rejects an empty todo"* and
@@ -91,13 +91,13 @@ Open the app, log in, and try to break the rules:
 1. Add a todo that is **only spaces**. What message do you see?
 2. Try typing a really long sentence, more than 200 letters. The box stops
    you! That's a check in the **frontend** (`maxlength="200"` in
-   [`frontend/todos.html`](../frontend/todos.html)). The backend checks
+   [`app/(site)/my-todos/page.js`](../app/%28site%29/my-todos/page.js)). The backend checks
    again too, in case someone skips our page. You'll see why in
    [Lesson 9](09-frontend-backend.md).
 3. Add `   hello   ` with spaces around it. Look closely: were the spaces kept?
 
 Then find the message you saw in step 1 inside
-[`backend/validation.js`](../backend/validation.js).
+[`lib/validation.js`](../lib/validation.js).
 
 ---
 [← Lesson 1](01-the-idea.md) · Next: [Lesson 3 · The UI →](03-ui.md)

@@ -26,7 +26,7 @@ drawer is a **row**. Each card has the same boxes to fill in; those are
 `user_id` in `todos` points to an `id` in `users`. That link is how we know
 todo 3 belongs to alex. It's called a **foreign key**.
 
-👉 The shape of the drawers is in [`backend/db/schema.sql`](../backend/db/schema.sql).
+👉 The shape of the drawers is in [`lib/db/schema.sql`](../lib/db/schema.sql).
 Read the comments: every column is explained.
 
 ## Talking to the database: SQL
@@ -46,7 +46,7 @@ Those `?` marks are **placeholders**. The real values are handed over
 [SQL injection bad example](../bad-examples/01-sql-injection.md) for what goes
 wrong without them.)
 
-👉 Every question we ask lives in one file, [`backend/db/database.js`](../backend/db/database.js).
+👉 Every question we ask lives in one file, [`lib/db/database.js`](../lib/db/database.js).
 No other file talks to the database. That makes it easy to check that every
 query is safe.
 

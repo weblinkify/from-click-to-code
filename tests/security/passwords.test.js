@@ -1,13 +1,13 @@
 // Passwords must never be stored as plain text.
 
-const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
-const { makeTestApp, signUp, TEST_PASSWORD } = require('../helpers/test-app');
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { makeTestApp, signUp, TEST_PASSWORD } from '../helpers/test-app.js';
 
 describe('storing passwords', () => {
   it('the database keeps a bcrypt hash, never the real password', async () => {
-    const { app, db } = makeTestApp();
-    await signUp(app, 'sam');
+    const { db } = makeTestApp();
+    await signUp('sam');
 
     const user = db.findUserByUsername('sam');
     assert.notEqual(user.passwordHash, TEST_PASSWORD);
@@ -17,9 +17,9 @@ describe('storing passwords', () => {
   });
 
   it('two people with the same password get different hashes (salt)', async () => {
-    const { app, db } = makeTestApp();
-    await signUp(app, 'sam');
-    await signUp(app, 'alex');
+    const { db } = makeTestApp();
+    await signUp('sam');
+    await signUp('alex');
 
     const sam = db.findUserByUsername('sam');
     const alex = db.findUserByUsername('alex');

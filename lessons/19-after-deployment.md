@@ -25,21 +25,21 @@ its own dashboard, made of three tools:
 
 ## ❤️ Health check
 
-[`backend/routes/health.js`](../backend/routes/health.js) answers
+[`app/health/route.js`](../app/health/route.js) answers
 `GET /health`. It doesn't just say "ok": it actually asks the database a tiny
 question (`SELECT 1`). Docker and cloud services call it every few seconds and
 raise the alarm if it fails.
 
 ## 📈 Metrics
 
-[`backend/metrics.js`](../backend/metrics.js) keeps counters that only go up.
+[`lib/metrics.js`](../lib/metrics.js) keeps counters that only go up.
 Visit http://localhost:3000/metrics. Watching *changes* matters most: if
 `errorsTotal` suddenly jumps, something is wrong. If `loginsFailed` jumps,
 maybe a robot is guessing passwords.
 
 ## 📒 Logs and request IDs
 
-[`backend/middleware/request-logger.js`](../backend/middleware/request-logger.js)
+[`lib/api.js`](../lib/api.js)
 writes one line per request. Each request gets a unique **request ID**, sent
 back to the browser in the `X-Request-Id` header. When something goes wrong,
 the user sees a **help code** (the start of that ID), and we can find the

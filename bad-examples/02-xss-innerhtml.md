@@ -47,10 +47,20 @@ function showTodo(todo) {
 
 Now the page shows the exact letters `<img src="nope" ...>`, and nothing runs.
 
-👉 See the real code: `buildTodoItem` in [`frontend/app.js`](../frontend/app.js).
-We also have a second safety net: the Content-Security-Policy header in
-[`backend/app.js`](../backend/app.js) tells the browser not to run inline scripts.
-Tests: [`tests/security/xss.test.js`](../tests/security/xss.test.js) and the
-Playwright test in [`tests/e2e/happy-path.spec.js`](../tests/e2e/happy-path.spec.js).
+**In React** (which our app uses), `{todo.text}` does this automatically: React
+always shows text as plain letters. The React way to make this mistake is a
+prop with a scary name on purpose: `dangerouslySetInnerHTML`. Our test makes
+sure it never appears in our code.
 
-**Review rule:** `innerHTML` with user text is almost always a bug. Use `textContent`.
+👉 See the real code: [`components/TodoItem.js`](../components/TodoItem.js).
+We also have a second safety net: the Content-Security-Policy in
+[`proxy.js`](../proxy.js) tells the browser to run only scripts carrying a secret
+"nonce" that changes on every visit.
+Tests: [`tests/security/xss.test.js`](../tests/security/xss.test.js) and the
+Playwright tests in [`tests/e2e/happy-path.spec.js`](../tests/e2e/happy-path.spec.js)
+and [`tests/e2e/course.spec.js`](../tests/e2e/course.spec.js).
+
+Try it safely in the app's security lab: **http://localhost:3000/course/security**.
+
+**Review rule:** `innerHTML` or `dangerouslySetInnerHTML` with user text is almost
+always a bug. Use `textContent`, or just `{text}` in React.

@@ -3,11 +3,11 @@
 // our app, exactly like a person would. These are "end-to-end" tests:
 // they test everything at once, from the buttons to the database.
 
-const { defineConfig, devices } = require('@playwright/test');
+import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 3100;
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './tests/e2e',
   // Stop forgetting "test.only" in CI.
   forbidOnly: Boolean(process.env.CI),
@@ -20,16 +20,17 @@ module.exports = defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  // Start our real app before the tests, with a fresh in-memory database.
+  // Build the app and start it before the tests, with a fresh in-memory database.
   webServer: {
-    command: 'node backend/server.js',
-    url: `http://localhost:${PORT}/`,
+    command: `npm run build && npx next start --port ${PORT}`,
+    url: `http://localhost:${PORT}/health`,
+    timeout: 180 * 1000,
     reuseExistingServer: false,
     env: {
-      PORT: String(PORT),
       DB_PATH: ':memory:',
       SESSION_SECRET: 'e2e-test-secret',
       BCRYPT_ROUNDS: '4',
+      LOGIN_MAX_ATTEMPTS: '5',
     },
   },
 });
