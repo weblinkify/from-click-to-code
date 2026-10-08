@@ -4,6 +4,7 @@
 // once for "Log in" and once for "Sign up".
 
 import { useState } from 'react';
+import ui from '../lib/ui.js';
 
 export default function AccountForm({ idPrefix, title, usernameLabel, passwordLabel, buttonLabel, isNewAccount, onSubmit }) {
   // React remembers what's typed in each box.
@@ -18,12 +19,15 @@ export default function AccountForm({ idPrefix, title, usernameLabel, passwordLa
   }
 
   return (
-    <section>
-      <h2>{title}</h2>
+    <section className={ui.card}>
+      <h2 className="text-xl font-extrabold text-slate-900">{title}</h2>
       <form onSubmit={handleSubmit}>
-        <label htmlFor={`${idPrefix}-username`}>{usernameLabel}</label>
+        <label htmlFor={`${idPrefix}-username`} className={ui.label}>
+          {usernameLabel}
+        </label>
         <input
           id={`${idPrefix}-username`}
+          className={ui.input}
           value={username}
           onChange={(event) => setUsername(event.target.value)}
           autoComplete="username"
@@ -32,9 +36,12 @@ export default function AccountForm({ idPrefix, title, usernameLabel, passwordLa
           maxLength={isNewAccount ? 30 : undefined}
         />
 
-        <label htmlFor={`${idPrefix}-password`}>{passwordLabel}</label>
+        <label htmlFor={`${idPrefix}-password`} className={ui.label}>
+          {passwordLabel}
+        </label>
         <input
           id={`${idPrefix}-password`}
+          className={ui.input}
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
@@ -43,7 +50,9 @@ export default function AccountForm({ idPrefix, title, usernameLabel, passwordLa
           minLength={isNewAccount ? 8 : undefined}
         />
 
-        <button type="submit">{buttonLabel}</button>
+        <button type="submit" className={`${ui.primaryButton} mt-6 w-full`}>
+          {buttonLabel}
+        </button>
       </form>
     </section>
   );

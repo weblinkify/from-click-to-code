@@ -3,6 +3,7 @@
 // The box where you type a new todo, and the "Add" button.
 
 import { useState } from 'react';
+import ui from '../lib/ui.js';
 
 // onAdd is a function the page gives us. It returns true if the todo was saved.
 export default function AddTodoForm({ onAdd }) {
@@ -22,20 +23,23 @@ export default function AddTodoForm({ onAdd }) {
   }
 
   return (
-    <form className="add-form" onSubmit={handleSubmit}>
-      {/* A label for screen readers, hidden from eyes. */}
-      <label htmlFor="todo-text" className="visually-hidden">
+    <form className="flex flex-col gap-2 sm:flex-row" onSubmit={handleSubmit}>
+      {/* A label for screen readers, hidden from eyes ("sr-only"). */}
+      <label htmlFor="todo-text" className="sr-only">
         What do you want to do?
       </label>
       <input
         id="todo-text"
+        className={ui.input}
         value={text}
         onChange={(event) => setText(event.target.value)}
         placeholder="What do you want to do?"
         maxLength={200}
         required
       />
-      <button type="submit">Add</button>
+      <button type="submit" className={ui.primaryButton}>
+        Add
+      </button>
     </form>
   );
 }

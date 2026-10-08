@@ -1,5 +1,5 @@
 'use client';
-// app/my-todos/page.js  ->  http://localhost:3000/my-todos
+// app/(site)/my-todos/page.js  ->  http://localhost:3000/my-todos
 // The page where your list lives. This is the FRONTEND: it runs inside
 // your web browser and talks to the backend (app/todos/route.js).
 //
@@ -11,11 +11,12 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AddTodoForm from '../../components/AddTodoForm.js';
-import Filters from '../../components/Filters.js';
-import TodoItem from '../../components/TodoItem.js';
-import Message from '../../components/Message.js';
-import { callApi, errorFrom, ServerDownError } from '../../lib/api-client.js';
+import AddTodoForm from '../../../components/AddTodoForm.js';
+import Filters from '../../../components/Filters.js';
+import TodoItem from '../../../components/TodoItem.js';
+import Message from '../../../components/Message.js';
+import { callApi, errorFrom, ServerDownError } from '../../../lib/api-client.js';
+import ui from '../../../lib/ui.js';
 
 // If the server is down, the banner already says so; ignore that error here.
 function ignoreServerDown(error) {
@@ -167,26 +168,36 @@ export default function MyTodosPage() {
     }
   }
 
+  // How many todos are not done yet (for the little counter).
+  const todosLeft = todos.filter((todo) => !todo.completed).length;
+
   // ----- What the page looks like -----
   // This HTML-looking code is called JSX. {curly braces} hold JavaScript.
+  // The className words are Tailwind CSS classes (see lib/ui.js).
   return (
-    <main className="card">
-      <header className="top-bar">
+    <main className={`${ui.card} mx-auto max-w-2xl`}>
+      <header className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1>My todos</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900">My todos</h1>
           {/* Only say hello once we know the name. */}
-          {username && <p className="greeting">Hi, {username}!</p>}
+          {username && <p className="greeting mt-1 text-slate-500">Hi, {username}! 👋</p>}
         </div>
-        <button type="button" className="secondary small" onClick={logOut}>
+        <button type="button" className={ui.smallSecondaryButton} onClick={logOut}>
           Log out
         </button>
       </header>
 
       <AddTodoForm onAdd={addTodo} />
       <Message text={message.text} isGood={message.isGood} />
-      <Filters current={filter} onChange={setFilter} />
 
-      <ul className="todo-list">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+        <Filters current={filter} onChange={setFilter} />
+        {username && filter === 'all' && todos.length > 0 && (
+          <p className="text-sm font-semibold text-slate-500">{todosLeft} left to do</p>
+        )}
+      </div>
+
+      <ul className="todo-list mt-4 divide-y divide-slate-100">
         {/* Build one TodoItem for each todo in the list. */}
         {todos.map((todo) => (
           <TodoItem key={todo.id} todo={todo} onToggle={setCompleted} onDelete={deleteTodo} />
@@ -195,7 +206,9 @@ export default function MyTodosPage() {
 
       {/* If the list is empty, show a friendly note. */}
       {username && todos.length === 0 && (
-        <p className="empty">Nothing here yet. Add your first todo above! 🌱</p>
+        <p className="rounded-xl bg-slate-50 py-10 text-center text-slate-500">
+          Nothing here yet. Add your first todo above! 🌱
+        </p>
       )}
     </main>
   );

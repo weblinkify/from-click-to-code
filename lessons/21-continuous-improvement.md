@@ -37,10 +37,10 @@ small risks: if something goes wrong, it's easy to see what and to undo it.
 
 | Idea | Size | Files you'd touch |
 |------|------|-------------------|
-| Show "3 todos left" under the list | 🟢 small | [`frontend/app.js`](../frontend/app.js), [`todos.html`](../frontend/todos.html) |
-| Edit a todo's words by double-clicking it | 🟡 medium | `app.js` (the API already supports it: `PUT /todos/:id`!) |
-| A "delete all finished todos" button | 🟡 medium | `routes/todos.js`, `database.js`, `app.js` + tests |
-| Due dates | 🟠 bigger | `schema.sql`, `validation.js`, routes, frontend, tests |
+| Show "3 todos left" under the list | 🟢 small | [`app/(site)/my-todos/page.js`](../app/%28site%29/my-todos/page.js) |
+| Edit a todo's words by double-clicking it | 🟡 medium | [`components/TodoItem.js`](../components/TodoItem.js) (the API already supports it: `PUT /todos/:id`!) |
+| A "delete all finished todos" button | 🟡 medium | `app/todos/route.js`, `lib/db/database.js`, `app/(site)/my-todos/page.js` + tests |
+| Due dates | 🟠 bigger | `schema.sql`, `validation.js`, routes, components, tests |
 | Keep the login rate limit across restarts | 🟠 bigger | `rate-limit.js`, `schema.sql` |
 
 ## Technical debt
@@ -86,9 +86,11 @@ three questions:
 Do one full trip around the loop with the 🟢 **"3 todos left"** idea:
 
 1. **Pick:** write it as a user story ([Lesson 2](02-requirements.md)).
-2. **Build:** on a new branch, add a `<p id="todos-left">` to `todos.html`.
-   In `renderTodos` in `app.js`, count the todos that aren't completed and
-   show the number with `textContent`.
+2. **Build:** on a new branch, open
+   [`app/(site)/my-todos/page.js`](../app/%28site%29/my-todos/page.js). Count the todos that
+   aren't completed:
+   `const todosLeft = todos.filter((todo) => !todo.completed).length;`
+   and show it under the list: `<p>{todosLeft} todos left</p>`.
 3. **Check:** add a step to [`tests/e2e/happy-path.spec.js`](../tests/e2e/happy-path.spec.js)
    that expects the text, and run `npm run test:e2e`.
 4. **Ship:** commit with a helpful message, then (if you're on GitHub) open a

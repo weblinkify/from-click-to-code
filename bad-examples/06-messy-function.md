@@ -53,13 +53,13 @@ function listTodos(userId, { onlyCompleted = false } = {}) {
 - The option is named (`onlyCompleted`), so the caller reads like a sentence:
   `listTodos(7, { onlyCompleted: true })`.
 - Text length is checked when the todo is **saved** (see
-  [`backend/validation.js`](../backend/validation.js)), so we never chop it here.
+  [`lib/validation.js`](../lib/validation.js)), so we never chop it here.
 - Errors aren't hidden. They travel up to the one place that handles them all,
-  [`backend/middleware/error-handler.js`](../backend/middleware/error-handler.js),
+  [`lib/api.js`](../lib/api.js),
   which logs the details and sends the user a calm message.
 
-👉 Compare with the real [`backend/db/database.js`](../backend/db/database.js)
-and [`backend/routes/todos.js`](../backend/routes/todos.js).
+👉 Compare with the real [`lib/db/database.js`](../lib/db/database.js)
+and [`app/todos/route.js`](../app/todos/route.js).
 
 **Review rule:** if you have to read a line three times, ask the author to
 split it up and give things better names. That's not being mean; it's

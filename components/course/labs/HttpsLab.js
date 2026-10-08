@@ -1,13 +1,18 @@
 'use client';
-// app/course/https/page.js  ->  http://localhost:3000/course/https
-// Lesson 6: HTTP and HTTPS. Postcards vs sealed envelopes.
+// components/course/labs/HttpsLab.js
+// The hands-on lab for Lesson 6: HTTP and HTTPS. Postcards vs sealed envelopes.
+// Shown in the course player at http://localhost:3000/course/https
 
 import { useEffect, useRef, useState } from 'react';
-import LessonFrame from '../../../components/course/LessonFrame.js';
-import Experiment from '../../../components/course/Experiment.js';
-import Quiz from '../../../components/course/Quiz.js';
-import CodeLink from '../../../components/course/CodeLink.js';
+import Experiment from '../Experiment.js';
+import Quiz from '../Quiz.js';
+import CodeLink from '../CodeLink.js';
 import { sendRaw } from '../../../lib/course/send.js';
+import ui from '../../../lib/ui.js';
+
+// Table styles, used by every table in this lab.
+const TABLE = 'w-full overflow-hidden rounded-xl border border-slate-200 bg-white text-left text-sm';
+const CELL = 'border-b border-slate-100 px-3 py-2 align-top break-words';
 
 // Turn bytes into letters we can show (a format called base64).
 function bytesToText(bytes) {
@@ -78,28 +83,30 @@ function PostcardOrEnvelope() {
   return (
     <Experiment title="🔬 Experiment 1: Postcard or envelope?">
       <p>Type a secret message, then see what a snoop on the café Wi-Fi would see.</p>
-      <label htmlFor="secret-input">Your secret message</label>
-      <input id="secret-input" value={message} onChange={onType} maxLength={80} autoComplete="off" />
+      <label htmlFor="secret-input" className={ui.label}>
+        Your secret message
+      </label>
+      <input id="secret-input" className={ui.input} value={message} onChange={onType} maxLength={80} autoComplete="off" />
 
-      <div className="two-columns">
-        <div className="mail postcard">
-          <h3>📮 HTTP (postcard)</h3>
-          <p className="muted">The snoop 👀 sees:</p>
-          <p className="mail-text" data-testid="postcard-text">{message}</p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
+          <h3 className="font-extrabold">📮 HTTP (postcard)</h3>
+          <p className="mt-2 text-sm text-slate-500">The snoop 👀 sees:</p>
+          <p className="mt-1 font-bold break-words" data-testid="postcard-text">{message}</p>
         </div>
-        <div className="mail envelope">
-          <h3>🔒 HTTPS (sealed envelope)</h3>
-          <p className="muted">The snoop 👀 sees:</p>
-          <p className="mail-text scrambled" data-testid="envelope-text">
+        <div className="rounded-xl border-2 border-emerald-300 bg-emerald-50 p-4">
+          <h3 className="font-extrabold">🔒 HTTPS (sealed envelope)</h3>
+          <p className="mt-2 text-sm text-slate-500">The snoop 👀 sees:</p>
+          <p className="mt-1 font-mono text-xs break-all" data-testid="envelope-text">
             {canEncrypt ? scrambled : 'Encryption only works on secure pages. Open this page at http://localhost:3000.'}
           </p>
-          <button type="button" className="small" onClick={unlock}>
+          <button type="button" className={`${ui.smallButton} mt-3`} onClick={unlock}>
             🔑 Unlock with the server&apos;s key
           </button>
-          {unlocked && <p className="mail-text" data-testid="unlocked-text">🔓 {unlocked}</p>}
+          {unlocked && <p className="mt-2 font-bold break-words" data-testid="unlocked-text">🔓 {unlocked}</p>}
         </div>
       </div>
-      <p className="muted">
+      <p className="text-sm text-slate-500">
         This is <b>real encryption</b> (called AES), done by your browser. Each time you type, a new scrambled message
         is made. Without the key it&apos;s just nonsense!
       </p>
@@ -139,23 +146,23 @@ function SecurityFacts() {
 
   return (
     <Experiment title="🔬 Experiment 2: Is this page using HTTPS?">
-      <table className="parts-table">
+      <table className={TABLE}>
         <tbody>
           <tr>
-            <td className="part-scheme">Scheme of this page</td>
-            <td>{facts.scheme}</td>
+            <td className={`${CELL} font-bold text-fuchsia-700`}>Scheme of this page</td>
+            <td className={CELL}>{facts.scheme}</td>
           </tr>
           <tr>
-            <td>Sealed envelope (HTTPS)?</td>
-            <td>{facts.usesHttps ? 'Yes 🔒' : 'No 📮'}</td>
+            <td className={CELL}>Sealed envelope (HTTPS)?</td>
+            <td className={CELL}>{facts.usesHttps ? 'Yes 🔒' : 'No 📮'}</td>
           </tr>
           <tr>
-            <td>Messages leave this computer?</td>
-            <td>{facts.isLocalhost ? 'No: localhost means "this computer"' : 'Yes'}</td>
+            <td className={CELL}>Messages leave this computer?</td>
+            <td className={CELL}>{facts.isLocalhost ? 'No: localhost means "this computer"' : 'Yes'}</td>
           </tr>
           <tr>
-            <td>Browser thinks it&apos;s safe?</td>
-            <td>{facts.isSecure ? 'Yes ✅' : 'No ⚠️'}</td>
+            <td className={CELL}>Browser thinks it&apos;s safe?</td>
+            <td className={CELL}>{facts.isSecure ? 'Yes ✅' : 'No ⚠️'}</td>
           </tr>
         </tbody>
       </table>
@@ -184,24 +191,24 @@ function CookieCheck() {
   return (
     <Experiment title="🔬 Experiment 3: The secret wristband cookie">
       <p>
-        When you log in, the server gives your browser a <b>cookie</b> named <code>sid</code>. That&apos;s your
+        When you log in, the server gives your browser a <b>cookie</b> named <code className={ui.inlineCode}>sid</code>. That&apos;s your
         &quot;wristband&quot;. It&apos;s marked <b>HttpOnly</b>, which means JavaScript on the page is{' '}
         <b>not allowed to read it</b>, so a sneaky script can&apos;t steal it.
       </p>
-      <button type="button" className="small" onClick={check}>
+      <button type="button" className={ui.smallButton} onClick={check}>
         Look for cookies
       </button>
       {visible && (
-        <div className="answer-box">
+        <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
           <p>
             <b>Cookies this page&apos;s JavaScript can see:</b>
           </p>
-          <pre data-testid="visible-cookies">{visible.length > 0 ? visible.join('\n') : '(none)'}</pre>
+          <pre className={ui.codeBlock} data-testid="visible-cookies">{visible.length > 0 ? visible.join('\n') : '(none)'}</pre>
           <p>
             <b>Does the server still know who you are?</b>
           </p>
-          <pre data-testid="who-am-i">{who ? `Yes! You are logged in as "${who}".` : 'No, you are not logged in.'}</pre>
-          <p className="muted">
+          <pre className={ui.codeBlock} data-testid="who-am-i">{who ? `Yes! You are logged in as "${who}".` : 'No, you are not logged in.'}</pre>
+          <p className="text-sm text-slate-600">
             {who
               ? '"sid" is NOT in the list, but the server still knows who you are. The browser sends the HttpOnly cookie to the server, but keeps it hidden from JavaScript. 🛡️'
               : 'Log in first (open the app in another tab), then press the button again.'}
@@ -239,17 +246,17 @@ function HeaderCheck() {
         With every answer, our server sends <b>security headers</b>: extra instructions telling the browser to be
         careful. Let&apos;s read them!
       </p>
-      <button type="button" className="small" onClick={check}>
+      <button type="button" className={ui.smallButton} onClick={check}>
         Read the headers
       </button>
       {headers && (
-        <table className="parts-table headers-table">
+        <table className={TABLE}>
           <tbody>
             {headers.map((header) => (
               <tr key={header.name}>
-                <td>{header.name}</td>
-                <td>{header.value || '(not sent)'}</td>
-                <td>{header.meaning}</td>
+                <td className={`${CELL} font-mono text-xs`}>{header.name}</td>
+                <td className={`${CELL} font-mono text-xs break-all`}>{header.value || '(not sent)'}</td>
+                <td className={CELL}>{header.meaning}</td>
               </tr>
             ))}
           </tbody>
@@ -260,14 +267,14 @@ function HeaderCheck() {
   );
 }
 
-export default function HttpsLesson() {
+export default function HttpsLab() {
   return (
-    <LessonFrame lessonId="https">
-      <p>
+    <>
+      <p className="text-slate-700">
         <b>HTTP</b> is the language browsers and servers use to talk. <b>HTTPS</b> is the same language with an{' '}
         <b>S for Secure</b>: every message is <b>encrypted</b> (scrambled) so nobody in the middle can read it.
       </p>
-      <p>
+      <p className="text-slate-700">
         HTTP is like a <b>postcard</b> 📮: anyone who handles it can read it. HTTPS is like a{' '}
         <b>sealed, locked envelope</b> 🔒: only the real server has the key.
       </p>
@@ -301,20 +308,6 @@ export default function HttpsLesson() {
         />
       </Experiment>
 
-      <Experiment title="🛠️ Mini challenge" variant="challenge">
-        <ol>
-          <li>
-            Open{' '}
-            <a href="https://www.wikipedia.org" target="_blank" rel="noopener noreferrer">
-              https://www.wikipedia.org
-            </a>{' '}
-            in a new tab.
-          </li>
-          <li>Click the icon just left of the address (it might look like 🔒 or a little slider).</li>
-          <li>Click <b>Connection is secure</b>, then <b>Certificate is valid</b>. Who issued Wikipedia&apos;s ID card?</li>
-          <li>Now look at the address bar on <i>this</i> page. Why is there no padlock here? (Hint: Experiment 2!)</li>
-        </ol>
-      </Experiment>
-    </LessonFrame>
+    </>
   );
 }

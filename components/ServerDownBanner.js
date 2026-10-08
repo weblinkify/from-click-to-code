@@ -30,7 +30,10 @@ export default function ServerDownBanner() {
     return null;
   }
   return (
-    <div className="banner" role="alert">
+    <div
+      className="banner fixed inset-x-4 top-4 z-50 mx-auto max-w-xl rounded-xl border-2 border-amber-300 bg-amber-100 px-5 py-3 font-bold text-amber-900 shadow-lg"
+      role="alert"
+    >
       😴 The server is taking a nap and we can&apos;t reach it. Please try again in a minute.
     </div>
   );

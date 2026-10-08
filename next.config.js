@@ -23,9 +23,10 @@ const nextConfig = {
   output: 'standalone',
   // Don't announce "X-Powered-By: Next.js": no need to tell attackers.
   poweredByHeader: false,
-  // Make sure schema.sql is packed into the standalone server.
+  // Make sure the files we read at runtime are packed into the standalone
+  // server: the database shape, and the written lessons for the course.
   outputFileTracingIncludes: {
-    '/**': ['./lib/db/schema.sql'],
+    '/**': ['./lib/db/schema.sql', './lessons/**/*.md'],
   },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];

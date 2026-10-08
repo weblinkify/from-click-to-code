@@ -37,7 +37,7 @@ function brokenLinksIn(file) {
     if (isExternal(target)) {
       continue;
     }
-    const withoutAnchor = target.split('#')[0];
+    const withoutAnchor = decodeURIComponent(target.split('#')[0]);
     const resolved = path.resolve(path.dirname(file), withoutAnchor);
     if (!fs.existsSync(resolved)) {
       broken.push(target);

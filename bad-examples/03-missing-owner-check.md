@@ -3,11 +3,14 @@
 ## The bad version ❌
 
 ```js
-// DON'T DO THIS
-router.delete('/:id', requireLogin, (req, res) => {
-  db.prepare('DELETE FROM todos WHERE id = ?').run(req.params.id);
-  res.status(200).json({ deleted: true });
-});
+// DON'T DO THIS  (app/todos/[id]/route.js)
+async function deleteTodo(call) {
+  const id = Number(call.params.id);
+  db.prepare('DELETE FROM todos WHERE id = ?').run(id);
+  return reply(200, { deleted: true });
+}
+
+export const DELETE = withApi(deleteTodo, { requireLogin: true });
 ```
 
 🔍 **Before reading on:** the user *is* logged in. So what's missing?
@@ -39,23 +42,24 @@ Always include the owner in the query. Then "id 42 **that belongs to Alice**"
 simply doesn't exist:
 
 ```js
-router.delete('/:id', requireLogin, (req, res) => {
+async function deleteTodo(call) {
+  const id = Number(call.params.id);
   const result = db
     .prepare('DELETE FROM todos WHERE id = ? AND user_id = ?')
-    .run(req.params.id, req.user.id);
+    .run(id, call.user.id);
 
   if (result.changes === 0) {
-    return res.status(404).json({ error: 'Todo not found.' });
+    return reply(404, { error: 'Todo not found.' });
   }
-  res.status(200).json({ deleted: true });
-});
+  return reply(200, { deleted: true });
+}
 ```
 
 We answer **404 "not found"** rather than "403 not yours", so Alice can't
 even find out that todo 42 exists.
 
-👉 See the real code: `deleteTodo` in [`backend/db/database.js`](../backend/db/database.js)
-and the routes in [`backend/routes/todos.js`](../backend/routes/todos.js).
+👉 See the real code: `deleteTodo` in [`lib/db/database.js`](../lib/db/database.js)
+and the route in [`app/todos/[id]/route.js`](../app/todos/[id]/route.js).
 Test: [`tests/security/authorization.test.js`](../tests/security/authorization.test.js).
 
 **Review rule:** for every query that touches a todo, find the `user_id = ?`.

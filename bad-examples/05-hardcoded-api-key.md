@@ -32,7 +32,7 @@ It's like writing your locker combination on the outside of your homework.
 ## The fix ✅
 
 1. Keep secrets in **environment variables**, read by
-   [`backend/config.js`](../backend/config.js).
+   [`lib/config.js`](../lib/config.js).
 2. Locally, put them in a `.env` file, which is listed in
    [`.gitignore`](../.gitignore) so Git never saves it.
 3. Share a **template** without real values:
@@ -50,7 +50,7 @@ if (!weatherApiKey) {
 **If a key ever leaks:** deleting it from the code is *not enough*. Go to the
 service and **revoke** (cancel) the key, then make a new one.
 
-👉 See how our app reads `SESSION_SECRET` in [`backend/config.js`](../backend/config.js).
+👉 See how our app reads `SESSION_SECRET` in [`lib/config.js`](../lib/config.js).
 
 **Review rule:** look for long random strings, `key`, `token`, `secret`,
 `password` in the code. They belong in `.env`.

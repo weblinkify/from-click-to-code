@@ -1,18 +1,19 @@
 'use client';
-// app/course/security/page.js  ->  http://localhost:3000/course/security
-// Lesson 15: the security lab. Try the classic sneaky tricks against our
-// app, SAFELY, and watch which defence stops each one.
+// components/course/labs/SecurityLab.js
+// The hands-on lab for Lesson 15: the security lab. Try the classic sneaky
+// tricks against our app, SAFELY, and watch which defence stops each one.
+// Shown in the course player at http://localhost:3000/course/security-review
 //
 // Everything here is harmless: the tricks only touch your own account,
 // and the "robot" attacks a made-up username that nobody uses.
 
 import { useState } from 'react';
 import Link from 'next/link';
-import LessonFrame from '../../../components/course/LessonFrame.js';
-import Experiment from '../../../components/course/Experiment.js';
-import Quiz from '../../../components/course/Quiz.js';
-import CodeLink from '../../../components/course/CodeLink.js';
+import Experiment from '../Experiment.js';
+import Quiz from '../Quiz.js';
+import CodeLink from '../CodeLink.js';
 import { sendWithApp, sendRaw } from '../../../lib/course/send.js';
+import ui from '../../../lib/ui.js';
 
 const XSS_TEXT = '<img src="nope" onerror="alert(\'hi\')">';
 const SQL_TEXT = "' OR '1'='1";
@@ -23,8 +24,15 @@ function LabResult({ result }) {
     return null;
   }
   return (
-    <div className={result.blocked ? 'lab-result is-blocked' : 'lab-result'} role="status">
-      <p className="lab-verdict">{result.verdict}</p>
+    <div
+      className={
+        result.blocked
+          ? 'lab-result is-blocked space-y-2 rounded-xl border-2 border-emerald-300 bg-emerald-50 p-4'
+          : 'lab-result space-y-2 rounded-xl border-2 border-slate-200 bg-white p-4'
+      }
+      role="status"
+    >
+      <p className="text-lg font-extrabold">{result.verdict}</p>
       {result.details}
     </div>
   );
@@ -47,7 +55,7 @@ function XssTrick() {
         <>
           <p>The server saved your todo exactly as typed (status {answer.status}). Here&apos;s how React shows it:</p>
           {/* React puts {text} on the page as plain letters, never as code. */}
-          <p className="lab-preview">{answer.data.todo ? answer.data.todo.text : XSS_TEXT}</p>
+          <p className="rounded-lg border-2 border-dashed border-slate-300 bg-white px-3 py-2 break-all">{answer.data.todo ? answer.data.todo.text : XSS_TEXT}</p>
           <p>
             <b>Defence:</b> React always shows text as letters. And even if a script did sneak in, the
             Content-Security-Policy only lets scripts with today&apos;s secret nonce run.
@@ -62,9 +70,11 @@ function XssTrick() {
       <p>
         A sneaky person adds a todo that is secretly HTML code:
       </p>
-      <pre>{XSS_TEXT}</pre>
+      <pre className={ui.codeBlock}>{XSS_TEXT}</pre>
       <p>If the app treated it as code, everyone viewing it would get a pop-up (or worse).</p>
-      <button type="button" className="small" onClick={tryIt}>Try the trick</button>
+      <button type="button" className={ui.smallButton} onClick={tryIt}>
+        Try the trick
+      </button>
       <LabResult result={result} />
       <p><CodeLink path="components/TodoItem.js">See components/TodoItem.js</CodeLink></p>
     </Experiment>
@@ -90,10 +100,10 @@ function SqlTrick() {
         <>
           <p>
             Your list still only has <b>your</b> {todos.length} todo{todos.length === 1 ? '' : 's'}, and the newest one
-            says exactly: <code>{created.data.todo ? created.data.todo.text : SQL_TEXT}</code>
+            says exactly: <code className={ui.inlineCode}>{created.data.todo ? created.data.todo.text : SQL_TEXT}</code>
           </p>
           <p>
-            <b>Defence:</b> every database question uses <code>?</code> placeholders, so your words travel separately
+            <b>Defence:</b> every database question uses <code className={ui.inlineCode}>?</code> placeholders, so your words travel separately
             from the command and can never become part of it.
           </p>
         </>
@@ -104,9 +114,11 @@ function SqlTrick() {
   return (
     <Experiment title="🧪 Trick 2: Talk to the database directly (SQL injection)">
       <p>A sneaky person types a piece of a database command into the todo box:</p>
-      <pre>{SQL_TEXT}</pre>
+      <pre className={ui.codeBlock}>{SQL_TEXT}</pre>
       <p>If the app glued it into its SQL, the database might hand over <i>everybody&apos;s</i> todos.</p>
-      <button type="button" className="small" onClick={tryIt}>Try the trick</button>
+      <button type="button" className={ui.smallButton} onClick={tryIt}>
+        Try the trick
+      </button>
       <LabResult result={result} />
       <p><CodeLink path="lib/db/database.js">See lib/db/database.js</CodeLink></p>
     </Experiment>
@@ -137,10 +149,10 @@ function PeekTrick() {
         <>
           <p>
             You asked to change todo <b>{targetId}</b>, which isn&apos;t yours. The app answered{' '}
-            <b>{answer.status}</b>: <code>{answer.data.error}</code>
+            <b>{answer.status}</b>: <code className={ui.inlineCode}>{answer.data.error}</code>
           </p>
           <p>
-            <b>Defence:</b> every todo query also checks <code>user_id = ?</code> (who owns it). Someone else&apos;s
+            <b>Defence:</b> every todo query also checks <code className={ui.inlineCode}>user_id = ?</code> (who owns it). Someone else&apos;s
             todo is treated as if it doesn&apos;t exist, so the app doesn&apos;t even reveal whether it&apos;s there.
           </p>
         </>
@@ -151,10 +163,12 @@ function PeekTrick() {
   return (
     <Experiment title="🧪 Trick 3: Change someone else's todo (IDOR)">
       <p>
-        Todo numbers just count up: 1, 2, 3… What if you sent <code>PUT /todos/&lt;someone else&apos;s number&gt;</code>?
+        Todo numbers just count up: 1, 2, 3… What if you sent <code className={ui.inlineCode}>PUT /todos/&lt;someone else&apos;s number&gt;</code>?
         We&apos;ll pick a number that isn&apos;t one of yours and try.
       </p>
-      <button type="button" className="small" onClick={tryIt}>Try the trick</button>
+      <button type="button" className={ui.smallButton} onClick={tryIt}>
+        Try the trick
+      </button>
       <LabResult result={result} />
       <p><CodeLink path="app/todos/[id]/route.js">See app/todos/[id]/route.js</CodeLink></p>
     </Experiment>
@@ -175,7 +189,7 @@ function CsrfTrick() {
         <>
           <p>
             Your browser sent your cookies along, but the request had no secret handshake token. The server said:{' '}
-            <code>{answer.data.error}</code>
+            <code className={ui.inlineCode}>{answer.data.error}</code>
           </p>
           <p>
             <b>Defence:</b> every change needs the CSRF token in a special header. Other websites can make your browser
@@ -192,7 +206,9 @@ function CsrfTrick() {
         You&apos;re logged in. A sneaky website quietly tells your browser to add a todo to <i>our</i> site. Your
         browser helpfully attaches your cookies…
       </p>
-      <button type="button" className="small" onClick={tryIt}>Try the trick</button>
+      <button type="button" className={ui.smallButton} onClick={tryIt}>
+        Try the trick
+      </button>
       <LabResult result={result} />
       <p><CodeLink path="lib/csrf.js">See lib/csrf.js</CodeLink></p>
     </Experiment>
@@ -222,14 +238,14 @@ function GuessingTrick() {
   return (
     <Experiment title="🧪 Trick 5: A robot guesses passwords">
       <p>A robot tries the most common passwords, one after another, as fast as it can.</p>
-      <button type="button" className="small" onClick={tryIt} disabled={running}>
+      <button type="button" className={ui.smallButton} onClick={tryIt} disabled={running}>
         {running ? 'The robot is guessing…' : 'Start the robot 🤖'}
       </button>
       {statuses.length > 0 && (
-        <ol className="guess-list">
+        <ol className="list-decimal space-y-1 pl-6">
           {statuses.map((attempt, index) => (
-            <li key={index} className={attempt.status === 429 ? 'is-blocked' : ''}>
-              <code>{attempt.guess}</code> → <b>{attempt.status}</b>{' '}
+            <li key={index} className={attempt.status === 429 ? 'font-bold text-rose-700' : ''}>
+              <code className={ui.inlineCode}>{attempt.guess}</code> → <b>{attempt.status}</b>{' '}
               {attempt.status === 429 ? '🚦 Too many tries, wait!' : '❌ wrong'}
             </li>
           ))}
@@ -254,16 +270,20 @@ function GuessingTrick() {
   );
 }
 
-export default function SecurityLesson() {
+export default function SecurityLab() {
   return (
-    <LessonFrame lessonId="security">
-      <p>
+    <>
+      <p className="text-slate-700">
         A <b>security review</b> means asking one question over and over:{' '}
         <i>&quot;If I were a sneaky person, how could I misuse this?&quot;</i> Today you get to be the (friendly)
         sneaky person, safely, against your own app.
       </p>
-      <p className="muted">
-        Tricks 1–4 need you to be logged in: <Link href="/login">log in</Link> in this tab first, then come back.
+      <p className="rounded-xl bg-amber-50 px-4 py-2 text-sm text-amber-900">
+        Tricks 1–4 need you to be logged in:{' '}
+        <Link href="/login" className={ui.link}>
+          log in
+        </Link>{' '}
+        in this tab first, then come back.
       </p>
 
       <XssTrick />
@@ -287,13 +307,6 @@ export default function SecurityLesson() {
         />
       </Experiment>
 
-      <Experiment title="🛠️ Mini challenge" variant="challenge">
-        <p>
-          Open your todos page. Find the todos the lab added. Do they look scary, or just like funny text? Tidy up by
-          deleting them. Then visit <a href="/metrics">/metrics</a>: did <code>loginsFailed</code> go up because of the
-          robot?
-        </p>
-      </Experiment>
-    </LessonFrame>
+    </>
   );
 }

@@ -25,15 +25,17 @@ holding the app *and everything it needs*.
                                                Container (running app)
                                                ┌─────────────────────┐
                                                │ Node.js 22          │
-                                               │ express, bcrypt...  │
-                                               │ backend/ frontend/  │
+                                               │ next, react, bcrypt │
+                                               │ our built app       │
                                                │ listening on :3000  │
                                                └─────────────────────┘
 ```
 
-- [`Dockerfile`](../Dockerfile): the recipe. Read the comments! It builds in
-  two stages, runs as a normal user (not the all-powerful *root*), and checks
-  `/health` every 30 seconds.
+- [`Dockerfile`](../Dockerfile): the recipe. Read the comments! It cooks in
+  three stages: install the libraries, **build** the app (`next build` turns
+  our React code into small, fast files), then pack only what's needed into a
+  small lunchbox. It runs as a normal user (not the all-powerful *root*), and
+  checks `/health` every 30 seconds.
 - [`docker-compose.yml`](../docker-compose.yml): starts the container with the
   right settings using one command, and keeps the database in a **volume**
   (a storage box outside the container) so todos survive restarts.

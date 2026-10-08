@@ -56,7 +56,7 @@ function listTodos(userId, searchWord) {
 Now `' OR '1'='1` is just some odd letters to search for, and it finds nothing.
 
 👉 See the real code: every query in
-[`backend/db/database.js`](../backend/db/database.js) uses `?`.
+[`lib/db/database.js`](../lib/db/database.js) uses `?`.
 The test [`tests/security/sql-injection.test.js`](../tests/security/sql-injection.test.js)
 proves SQL-looking input is stored as plain text.
 

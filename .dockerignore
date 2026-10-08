@@ -1,5 +1,6 @@
 # Files that should NOT go into the Docker lunchbox.
 # Smaller images build faster, and secrets stay out.
+# (lessons/ IS packed: the course player reads it.)
 .git
 .github
 node_modules
@@ -11,8 +12,8 @@ data
 tests
 test-results
 playwright-report
-lessons
 bad-examples
-*.md
+README.md
+CLAUDE.md
 Dockerfile
 docker-compose.yml

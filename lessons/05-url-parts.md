@@ -19,7 +19,7 @@ city, street and house number.
 | **Query** | `?completed=true` | *Extra details* | "Please, only the red ones" |
 | **Fragment** | `#top` | A spot *on* the page (never sent to the server) | "Read page 3 first" |
 
-> 🖥️ **Prefer clicking to reading?** With the app running, open the interactive version of this lesson at **http://localhost:3000/course/url.html**.
+> 🖥️ **Prefer clicking to reading?** With the app running, open the interactive version of this lesson at **http://localhost:3000/course/url**.
 
 ## Our app's URLs
 
@@ -33,12 +33,12 @@ When you run the app on your computer:
 
 - **`localhost`** = this computer.
 - **`3000`** = the door our app listens at. See `port` in
-  [`backend/config.js`](../backend/config.js). Change `PORT` in your `.env`
+  [`lib/config.js`](../lib/config.js). Change `PORT` in your `.env`
   and the door number changes!
 - **`/todos`** = the list of todos. Each path is handled by a route in
-  [`backend/routes/todos.js`](../backend/routes/todos.js).
+  [`app/todos/route.js`](../app/todos/route.js).
 - **`?completed=true`** = "only the finished ones, please". The code that reads
-  it is `validateCompletedFilter` in [`backend/validation.js`](../backend/validation.js).
+  it is `validateCompletedFilter` in [`lib/validation.js`](../lib/validation.js).
 
 ## Paths with numbers in them
 
@@ -81,7 +81,7 @@ the address bar and compare what you see:
 3. http://localhost:3000/todos?completed=banana 🍌
 
 Number 3 gives a **400** answer. Find the friendly message it shows inside
-[`backend/validation.js`](../backend/validation.js). Now click the **To do**
+[`lib/validation.js`](../lib/validation.js). Now click the **To do**
 and **Done** buttons on the todos page with the **Network** tab open: which
 URLs do they ask for?
 

@@ -12,13 +12,13 @@ still protects you. This is called **defence in depth**.
    🌍 the internet
         │
    ┌────▼──────────────────────────────────────────────┐
-   │ 🧱 Security headers   (helmet, in app.js)          │
+   │ 🧱 Security headers   (proxy.js)                   │
    │  ┌───────────────────────────────────────────────┐ │
    │  │ 🚦 Rate limit on login   (rate-limit.js)      │ │
    │  │  ┌──────────────────────────────────────────┐ │ │
    │  │  │ 🤝 CSRF handshake        (csrf.js)        │ │ │
    │  │  │  ┌─────────────────────────────────────┐ │ │ │
-   │  │  │  │ 🎟️ Login check   (require-login.js) │ │ │ │
+   │  │  │  │ 🎟️ Login check   (lib/api.js)       │ │ │ │
    │  │  │  │  ┌────────────────────────────────┐ │ │ │ │
    │  │  │  │  │ ✅ Input checks (validation.js) │ │ │ │ │
    │  │  │  │  │  ┌───────────────────────────┐ │ │ │ │ │
@@ -36,17 +36,17 @@ still protects you. This is called **defence in depth**.
 
 | # | Defence | Stops… | Where |
 |---|---------|--------|-------|
-| 1 | Passwords hashed with bcrypt | Stolen passwords | [`routes/auth.js`](../backend/routes/auth.js) |
-| 2 | HttpOnly, Secure, SameSite cookies | Stolen or misused wristbands | [`middleware/sessions.js`](../backend/middleware/sessions.js) |
-| 3 | CSRF handshake | Other sites acting as you | [`middleware/csrf.js`](../backend/middleware/csrf.js) |
-| 4 | Owner check on every query | Seeing or changing others' todos | [`db/database.js`](../backend/db/database.js) |
-| 5 | Input validation | Weird or huge input | [`validation.js`](../backend/validation.js) |
-| 6 | `?` placeholders in SQL | SQL injection | [`db/database.js`](../backend/db/database.js) |
-| 7 | `textContent`, never `innerHTML` | XSS (sneaky scripts) | [`frontend/app.js`](../frontend/app.js) |
-| 8 | Rate limit on login | Password-guessing robots | [`middleware/rate-limit.js`](../backend/middleware/rate-limit.js) |
-| 9 | Security headers (helmet) | Lots of browser tricks | [`app.js`](../backend/app.js) |
+| 1 | Passwords hashed with bcrypt | Stolen passwords | [`app/auth/signup/route.js`](../app/auth/signup/route.js) |
+| 2 | HttpOnly, Secure, SameSite cookies | Stolen or misused wristbands | [`lib/sessions.js`](../lib/sessions.js) |
+| 3 | CSRF handshake | Other sites acting as you | [`lib/csrf.js`](../lib/csrf.js) |
+| 4 | Owner check on every query | Seeing or changing others' todos | [`lib/db/database.js`](../lib/db/database.js) |
+| 5 | Input validation | Weird or huge input | [`lib/validation.js`](../lib/validation.js) |
+| 6 | `?` placeholders in SQL | SQL injection | [`lib/db/database.js`](../lib/db/database.js) |
+| 7 | React shows text as text, never `dangerouslySetInnerHTML` | XSS (sneaky scripts) | [`components/TodoItem.js`](../components/TodoItem.js) |
+| 8 | Rate limit on login (per username) | Password-guessing robots | [`lib/rate-limit.js`](../lib/rate-limit.js) |
+| 9 | Security headers (CSP with a fresh nonce, and more) | Lots of browser tricks | [`proxy.js`](../proxy.js), [`next.config.js`](../next.config.js) |
 | 10 | Secrets in `.env` | Leaked keys | [`.env.example`](../.env.example), [`.gitignore`](../.gitignore) |
-| 11 | Generic error messages | Giving attackers clues | [`middleware/error-handler.js`](../backend/middleware/error-handler.js) |
+| 11 | Generic error messages | Giving attackers clues | [`lib/api.js`](../lib/api.js) |
 | 12 | `npm audit` in CI | Libraries with known holes | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |
 
 Every defence has a comment in plain words right next to it in the code. Go
@@ -87,7 +87,8 @@ change. The answer is **403 Forbidden**.
 
 1. Open http://localhost:3000, then DevTools → **Network**, refresh, click the
    first request and look at **Response Headers**. Find
-   `Content-Security-Policy` and `X-Frame-Options`. Those are helmet's work!
+   `Content-Security-Policy` and `X-Frame-Options`. Those come from
+   `proxy.js` and `next.config.js`! Refresh again: did the `nonce-…` part change?
 2. On the login page, type a wrong password **six times**. What message
    appears on the sixth try? (Then wait 15 minutes, or restart the app, to try
    again.)

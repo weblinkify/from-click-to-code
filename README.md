@@ -5,12 +5,21 @@
 A small, **real** web app for learning how websites work, from an idea all the
 way to a server in the cloud.
 
-You can sign up, log in, add a todo, tick it off, and delete it. Every part of
-the code is written to be *read*, with simple comments, so a grown-up and a kid
-can explore it together. Alongside the app there are **22 short lessons** that
-point at the real files.
+You can sign up, log in, add a todo, tick it off, and delete it. Built into the
+app is a full online course, **"How the Web Works: From Click to Code"**: 23
+short lessons and 6 hands-on labs, with a progress bar, quizzes and a
+"Mark complete & continue" button, like Udemy or Coursera. Every lab uses the
+real app running on your computer.
 
-👉 **Start here after it's running: [the lessons](lessons/README.md)**
+Every part of the code is written to be *read*, with simple comments, so a
+grown-up and a kid can explore it together.
+
+| What | Where |
+|------|-------|
+| 📝 The todo app | http://localhost:3000 |
+| 🎓 The course | http://localhost:3000/course |
+| 📖 The lessons as files | [`lessons/`](lessons/README.md) |
+| 🕵️ Code review practice | [`bad-examples/`](bad-examples/README.md) |
 
 ---
 
@@ -37,9 +46,10 @@ computer. You don't need to install anything else.
    ```bash
    docker compose up --build
    ```
-   The first time takes a few minutes. When you see `"message":"server started"`,
-   it's ready.
+   The first time takes a few minutes (it installs libraries and builds the
+   app). When you see `"message":"server started"`, it's ready.
 5. Open **http://localhost:3000** in your web browser. 🎉
+   Then visit **http://localhost:3000/course** to start the course.
 
 To **stop** the app, press `Ctrl + C` in the terminal. Your todos are kept for
 next time. To delete everything and start fresh: `docker compose down -v`.
@@ -52,10 +62,17 @@ Check with `node --version`.
 ```bash
 npm install              # download the libraries (once)
 cp .env.example .env     # your private settings (once)
-npm run dev              # start the app; it restarts when you save a file
+npm run dev              # start the app; it updates as soon as you save a file
 ```
 
 Open **http://localhost:3000**. The database is saved in `data/todos.db`.
+
+To run it the way a real server does (faster, no live updates):
+
+```bash
+npm run build            # check and pack the app
+npm start                # start the packed app
+```
 
 ## 3 · Run the tests
 
@@ -73,24 +90,32 @@ npx playwright test --headed     # ...and watch the robot click around!
 ## What's inside
 
 ```
-README.md          ← you are here
-CLAUDE.md          ← the rules for working on this code
-lessons/           ← 22 lessons, from "the idea" to "the big picture"
-frontend/          ← what runs in your browser (HTML, CSS, JavaScript)
-backend/           ← what runs on the server
-  server.js        ← starts the app
-  app.js           ← connects all the pieces, in order
-  routes/          ← the API: auth.js, todos.js, health.js, metrics.js
-  db/              ← schema.sql (the shape of the data) + database.js
-  middleware/      ← helpers every request passes: login check, CSRF,
-                     rate limit, error handler, request logger…
-tests/             ← unit/, integration/, security/, e2e/
-bad-examples/      ← code with mistakes on purpose, for review practice
-                     (never used by the real app)
-.github/workflows/ ← ci.yml: the robot that checks every change
-Dockerfile         ← the recipe for the app's container
-docker-compose.yml ← starts it all with one command
-.env.example       ← a template for your private settings
+README.md           <- you are here
+CLAUDE.md           <- the rules for working on this code
+lessons/            <- 23 written lessons (the course reads these)
+app/                <- the Next.js app: pages AND the API
+  (site)/           <- the normal pages: home, login, my-todos, course home
+  (player)/course/  <- the course player (one page for every lesson)
+  todos/route.js    <- the API for todos (GET, POST)
+  todos/[id]/       <- the API for one todo (PUT, DELETE)
+  auth/             <- sign up, log in, log out, "who am I?", CSRF token
+  health/ metrics/  <- "am I alive?" and "how am I doing?"
+  globals.css       <- Tailwind CSS
+components/         <- React components: the Lego bricks of the screens
+  course/           <- the course player, sidebar, quizzes...
+  course/labs/      <- the 6 hands-on labs
+lib/                <- helpers: database, validation, sessions, CSRF,
+                       rate limit, logger, metrics, and lib/api.js (the
+                       "middleware chain" every API request goes through)
+proxy.js            <- adds the Content-Security-Policy to every page
+instrumentation.js  <- runs once when the server starts
+tests/              <- unit/, integration/, security/, e2e/
+bad-examples/       <- code with mistakes on purpose, for review practice
+                       (never used by the real app)
+.github/workflows/  <- ci.yml: the robot that checks every change
+Dockerfile          <- the recipe for the app's container
+docker-compose.yml  <- starts it all with one command
+.env.example        <- a template for your private settings
 ```
 
 ## The API
@@ -110,14 +135,16 @@ docker-compose.yml ← starts it all with one command
 | `GET` | `/metrics` | Counters: requests, errors, todos created, failed logins |
 
 All `POST`, `PUT` and `DELETE` requests need the `X-CSRF-Token` header (the
-frontend handles this for you). See [lesson 10](lessons/10-apis.md).
+app handles this for you). Try them yourself in the course's API lab:
+http://localhost:3000/course/api.
 
 ## All the commands
 
 | Command | What it does |
 |---------|--------------|
-| `npm start` | Start the app |
-| `npm run dev` | Start the app and restart it whenever you save a file |
+| `npm run dev` | Start the app for development (updates when you save) |
+| `npm run build` | Check and pack the app for real use |
+| `npm start` | Start the packed app (run `npm run build` first) |
 | `npm test` | Run unit, integration and security tests |
 | `npm run test:unit` / `test:integration` / `test:security` | Run one kind of test |
 | `npm run test:e2e` | Run the browser tests (Playwright) |
@@ -138,21 +165,23 @@ Settings live in `.env` (copy it from [`.env.example`](.env.example)). Your
 | `DB_PATH` | `data/todos.db` | Where the database file is saved |
 | `SESSION_SECRET` | *(random)* | Secret for signing security tokens. **Set this!** |
 | `COOKIE_SECURE` | on in production | Cookies only travel over HTTPS |
-| `LOGIN_MAX_ATTEMPTS` / `LOGIN_WINDOW_MINUTES` | `5` / `15` | Login rate limit |
+| `LOGIN_MAX_ATTEMPTS` / `LOGIN_WINDOW_MINUTES` | `5` / `15` | Login rate limit (per username) |
 | `BCRYPT_ROUNDS` | `12` | How hard password scrambling works |
 | `TRUST_PROXY` | `false` | Set `true` behind a cloud load balancer |
 | `BREAK_DATABASE` | `false` | 🚨 Incident drill only: makes the database fail |
 
 ## The incident drill 🚨
 
-Practise fixing a broken app, safely:
+Practise fixing a broken app, safely. Open the live dashboard at
+http://localhost:3000/course/incident, then restart the app with:
 
 ```bash
 BREAK_DATABASE=true docker compose up
 ```
 
-Then follow [lesson 20](lessons/20-incident-drill.md) step by step: detect it,
-read the logs, find the cause, fix it, and add a test.
+Watch the light turn red, then follow
+[lesson 20](lessons/20-incident-drill.md): detect it, read the logs, find the
+cause, fix it, and add a test.
 
 ---
 
@@ -168,7 +197,7 @@ door: with Docker, change the `ports` line in `docker-compose.yml` to
 http://localhost:3001.
 
 **"This database was made by an older version of the app"**
-Your `data/todos.db` is from an early version. Delete it and start again:
+Your `data/todos.db` is from a very early version. Delete it and start again:
 `rm data/todos.db` (with Docker: `docker compose down -v`).
 
 **I can't log in and nothing happens**
@@ -182,6 +211,10 @@ That's the login rate limit doing its job! Wait 15 minutes, or restart the app.
 **"The server is taking a nap"**
 The app isn't running. Start it again (see above), then refresh the page.
 
+**My course progress disappeared**
+Progress is saved in your browser only. A private window, or clearing your
+browser data, starts it fresh.
+
 **`npm install` fails while building `better-sqlite3` or `bcrypt`**
 Check `node --version` says 22 or newer. If it does, try deleting the
 `node_modules` folder and running `npm install` again.
@@ -190,10 +223,17 @@ Check `node --version` says 22 or newer. If it does, try deleting the
 
 ## For grown-ups: how this was built
 
-The Git history is part of the lesson. Each phase is one commit:
+The Git history is part of the lesson. It has two chapters:
+
+1. **Chapter 1:** plain HTML, CSS and JavaScript with an Express backend
+   (Git tag `v1-plain-html`).
+2. **Chapter 2:** rebuilt with Next.js, React and Tailwind CSS, keeping the
+   same API and the same tests.
 
 ```bash
 git log --oneline
+git show v1-plain-html:frontend/app.js   # read the old version
 ```
 
-Read [lesson 16](lessons/16-git-and-pull-requests.md) to explore it together.
+Read [lesson 16](lessons/16-git-and-pull-requests.md) and the bonus
+[lesson 23](lessons/23-from-plain-to-react.md) to explore it together.

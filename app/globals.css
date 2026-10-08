@@ -1,244 +1,34 @@
 /*
-  globals.css decides how things LOOK: colours, sizes and spacing.
-  It is loaded once, in app/layout.js, for every page.
-  HTML (here: React components) is the skeleton, CSS is the clothes,
-  JavaScript is the muscles.
+  globals.css: the styles for every page.
+
+  We use Tailwind CSS. Instead of writing CSS rules in this file, we put
+  small "utility" class names right on each element, like:
+
+    <button className="rounded-lg bg-blue-600 px-4 py-2 font-bold text-white">
+
+  which means: rounded corners, a blue background, some padding, bold
+  white text. Tailwind reads every file in the project and creates the CSS
+  for exactly the classes we used. Nothing more.
+
+  HTML is the skeleton, CSS is the clothes, JavaScript is the muscles.
 */
 
-/* Colours we reuse, given friendly names. */
-:root {
-  --background: #fdf6e3;
-  --card: #ffffff;
-  --text: #2d2a32;
-  --muted: #6b6475;
-  --primary: #3b6ef5;
-  --primary-dark: #2a53c4;
-  --success: #2e9e5b;
-  --danger: #d64545;
-  --border: #e5ddc8;
+@import "tailwindcss";
+
+/* Our own names for the fonts, used as font-sans and font-mono. */
+@theme {
+  --font-sans: ui-rounded, "SF Pro Rounded", "Nunito", "Trebuchet MS", system-ui, sans-serif;
+  --font-mono: "SF Mono", Menlo, Consolas, monospace;
 }
 
-* {
-  box-sizing: border-box;
-}
+/* A few base styles Tailwind doesn't set for us. */
+@layer base {
+  body {
+    @apply bg-slate-50 font-sans text-slate-800 antialiased;
+  }
 
-body {
-  margin: 0;
-  padding: 24px 16px;
-  font-family: "Trebuchet MS", system-ui, sans-serif;
-  font-size: 18px;
-  line-height: 1.5;
-  color: var(--text);
-  background: var(--background);
-}
-
-.card {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 24px;
-  background: var(--card);
-  border: 2px solid var(--border);
-  border-radius: 16px;
-}
-
-h1 {
-  margin-top: 0;
-}
-
-.lead {
-  font-size: 1.15rem;
-}
-
-.steps {
-  padding: 0;
-  list-style: none;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-label {
-  display: block;
-  margin-top: 12px;
-  font-weight: bold;
-}
-
-input {
-  width: 100%;
-  padding: 10px 12px;
-  font: inherit;
-  border: 2px solid var(--border);
-  border-radius: 10px;
-}
-
-input:focus,
-button:focus-visible,
-a:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 2px;
-}
-
-button,
-.button {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 10px 18px;
-  font: inherit;
-  font-weight: bold;
-  color: #fff;
-  text-decoration: none;
-  background: var(--primary);
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-button:hover,
-.button:hover {
-  background: var(--primary-dark);
-}
-
-.secondary {
-  color: var(--primary);
-  background: #eef2ff;
-}
-
-.secondary:hover {
-  background: #dfe6ff;
-}
-
-.small {
-  margin-top: 0;
-  padding: 6px 12px;
-  font-size: 0.9rem;
-}
-
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.greeting {
-  margin: -8px 0 8px;
-  color: var(--muted);
-}
-
-.add-form {
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
-}
-
-.add-form button {
-  flex-shrink: 0;
-}
-
-.filters {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.filter {
-  color: var(--text);
-  background: #f2eee3;
-}
-
-.filter:hover {
-  background: #e7e1d2;
-}
-
-.filter.is-active {
-  color: #fff;
-  background: var(--text);
-}
-
-.todo-list {
-  padding: 0;
-  list-style: none;
-}
-
-.todo-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.todo-item input[type="checkbox"] {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-.todo-text {
-  flex-grow: 1;
-  overflow-wrap: anywhere;
-}
-
-.todo-item.is-done .todo-text {
-  color: var(--muted);
-  text-decoration: line-through;
-}
-
-.delete-button {
-  margin-top: 0;
-  padding: 4px 10px;
-  color: var(--danger);
-  background: transparent;
-  border: 2px solid var(--danger);
-}
-
-.delete-button:hover {
-  color: #fff;
-  background: var(--danger);
-}
-
-.message {
-  min-height: 1.5em;
-  color: var(--danger);
-  font-weight: bold;
-}
-
-.message.is-good {
-  color: var(--success);
-}
-
-.empty {
-  color: var(--muted);
-  text-align: center;
-}
-
-/* The yellow strip that appears when the server can't be reached. */
-.banner {
-  max-width: 560px;
-  margin: 0 auto 16px;
-  padding: 12px 16px;
-  font-weight: bold;
-  background: #fff3c4;
-  border: 2px solid #e8c547;
-  border-radius: 12px;
-}
-
-/* Hidden from eyes, but still read aloud by screen readers. */
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-}
-
-@media (max-width: 420px) {
-  .add-form {
-    flex-direction: column;
-    align-items: stretch;
+  /* A clear ring around whatever the keyboard is on, for keyboard users. */
+  :focus-visible {
+    @apply outline-3 outline-offset-2 outline-blue-500;
   }
 }

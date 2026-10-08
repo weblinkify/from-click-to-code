@@ -8,6 +8,10 @@ action.
 Read them in order. Each one ends with a few questions (answers hidden, so try
 first!) and a hands-on challenge using the running app.
 
+> 🎓 **Prefer an online-course feel?** All of these lessons also play inside
+> the app, with a progress bar, quizzes and 6 hands-on labs. Start the app
+> and open **http://localhost:3000/course**.
+
 > **Grown-ups:** start the app first (see the main [README](../README.md)).
 > Most challenges need it running at http://localhost:3000.
 
@@ -35,5 +39,6 @@ first!) and a hands-on challenge using the running app.
 | 20 | [Incident drill](20-incident-drill.md) | Practising for when things break |
 | 21 | [Continuous improvement](21-continuous-improvement.md) | Getting a little better every week |
 | 22 | [The big picture](22-big-picture.md) | Putting it all together |
+| ⭐ 23 | [From plain JavaScript to React](23-from-plain-to-react.md) | Why frameworks exist (bonus) |
 
 Want to practise spotting mistakes? Visit the [bad examples](../bad-examples/README.md).

@@ -32,10 +32,10 @@ The **method** is the *kind* of order:
 ## A real order, step by step
 
 ```
-   Frontend (app.js)                                    Backend (routes/todos.js)
+   Frontend (lib/api-client.js)                         Backend (app/todos/route.js)
 
-   POST /todos                                      ┌─> is the user logged in?   no → 401
-   Content-Type: application/json                   │   is the handshake right?  no → 403
+   POST /todos                                      ┌─> is the handshake right?  no → 403
+   Content-Type: application/json                   │   is the user logged in?   no → 401
    X-CSRF-Token: 4be1...                  ──────────┤   is the text OK?          no → 400
                                                     │   save it in the database
    {"text": "Feed the cat"}                         └─> 201 Created
@@ -68,9 +68,12 @@ write information that both people and computers can read:
 
 A handy rule: **2xx = 🙂 worked, 4xx = 🤔 your mistake, 5xx = 😵 our mistake.**
 
-👉 The whole menu is built in [`backend/routes/todos.js`](../backend/routes/todos.js)
-and [`backend/routes/auth.js`](../backend/routes/auth.js). The frontend
-orders from it with `callApi` in [`frontend/app.js`](../frontend/app.js).
+👉 The whole menu is built in [`app/todos/route.js`](../app/todos/route.js)
+and the [`app/auth/`](../app/auth) folder. The frontend orders from it with
+`callApi` in [`lib/api-client.js`](../lib/api-client.js).
+
+🧪 **Try it yourself:** the app has a request builder where *you* are the
+frontend: **http://localhost:3000/course/api**.
 
 ## New words
 

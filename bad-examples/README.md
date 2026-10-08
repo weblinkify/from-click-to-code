@@ -6,8 +6,11 @@ so you can practise finding it.
 
 > ⚠️ **Nothing in this folder is part of the real app.**
 > The code lives inside Markdown files, so it can't be run or imported by
-> accident. The real, safe versions are in [`../backend`](../backend) and
-> [`../frontend`](../frontend).
+> accident. The real, safe versions are in [`../app`](../app),
+> [`../components`](../components) and [`../lib`](../lib).
+>
+> 🎮 Prefer a game? Play **Spot the bug** in the running app at
+> **http://localhost:3000/course/code-review**: it uses these same examples.
 
 ## How to use these
 

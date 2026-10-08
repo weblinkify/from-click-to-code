@@ -7,7 +7,7 @@ you write the address on the front and sign your name at the end.
 **HTTPS** is the same language with an **S for Secure**: everything is
 **encrypted** (scrambled) so nobody in the middle can read it.
 
-> 🖥️ **Prefer clicking to reading?** With the app running, open the interactive version of this lesson at **http://localhost:3000/course/https.html**.
+> 🖥️ **Prefer clicking to reading?** With the app running, open the interactive version of this lesson at **http://localhost:3000/course/https**.
 
 ## Postcard vs sealed envelope
 
@@ -37,13 +37,13 @@ On your own computer we use plain `http://localhost`. That's OK, because the
 messages never leave your computer. On a real server we'd always use HTTPS.
 The app is ready for that:
 
-- **Secure cookies.** In [`backend/middleware/sessions.js`](../backend/middleware/sessions.js),
+- **Secure cookies.** In [`lib/sessions.js`](../lib/sessions.js),
   the login cookie gets `secure: config.cookieSecure`. A **Secure** cookie is
   only ever sent inside the sealed envelope (HTTPS). It's switched on in
-  production by [`backend/config.js`](../backend/config.js).
-- **"Always use HTTPS" header.** In [`backend/app.js`](../backend/app.js),
-  `strictTransportSecurity` tells browsers *"from now on, only visit me over
-  HTTPS"*. We only turn it on when we really have HTTPS.
+  production by [`lib/config.js`](../lib/config.js).
+- **"Always use HTTPS" header.** In [`proxy.js`](../proxy.js), the
+  `Strict-Transport-Security` header tells browsers *"from now on, only visit
+  me over HTTPS"*. We only send it when we really have HTTPS.
 - **Why docker-compose turns Secure off.** Read the comment in
   [`docker-compose.yml`](../docker-compose.yml): on `http://localhost`, some
   browsers would throw Secure cookies away and you couldn't log in!

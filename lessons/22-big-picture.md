@@ -20,17 +20,17 @@ It's like looking at a whole town from a hilltop after exploring every street.
 
   👧 browser                                                          server 🖥️
   ┌───────────────┐   HTTPS 🔒    ┌──────────────────────────────────────────────┐
-  │ todos.html    │  POST /todos  │ request-logger  (gives it an ID, logs it)    │
-  │ style.css     │ ────────────> │ helmet          (security headers)          │
-  │ app.js        │  + cookie     │ cookies + session (who are you? → sam)       │
-  │  callApi()    │  + CSRF token │ csrf            (secret handshake ok?)       │
-  │               │               │ requireLogin    (logged in?)                 │
-  │               │               │ routes/todos.js (the chef)                   │
+  │ my-todos page │  POST /todos  │ lib/api.js withApi():                        │
+  │ AddTodoForm   │ ────────────> │   request ID   (a name tag for the logs)     │
+  │ api-client.js │  + cookie     │   session      (who are you? → sam)          │
+  │  callApi()    │  + CSRF token │   csrf         (secret handshake ok?)        │
+  │               │               │   login check  (logged in?)                  │
+  │               │               │ app/todos/route.js  (the chef)               │
   │               │               │   validation.js (1–200 characters?)          │
   │               │               │   database.js   (INSERT ... VALUES (?, ?))   │
   │               │               │        │                                     │
   │               │  201 Created  │        ▼                                     │
-  │ textContent ✅ │ <──────────── │   🗄️ todos.db   📈 metrics: todosCreated + 1  │
+  │ React {text}✅│ <──────────── │   🗄️ todos.db   📈 metrics: todosCreated + 1  │
   └───────────────┘   {"todo":…}  └──────────────────────────────────────────────┘
 ```
 
@@ -39,16 +39,16 @@ It's like looking at a whole town from a hilltop after exploring every street.
 | Concept | Lesson | Where in this project |
 |---------|--------|-----------------------|
 | The idea | [01](01-the-idea.md) | [`README.md`](../README.md) |
-| Requirements | [02](02-requirements.md) | [`backend/validation.js`](../backend/validation.js) |
-| UI | [03](03-ui.md) | [`frontend/`](../frontend) |
-| Clicking a URL | [04](04-what-happens-when-you-click.md) | [`backend/app.js`](../backend/app.js) |
-| URL parts | [05](05-url-parts.md) | [`backend/config.js`](../backend/config.js) |
-| HTTP vs HTTPS | [06](06-http-vs-https.md) | [`backend/middleware/sessions.js`](../backend/middleware/sessions.js) |
-| Login | [07](07-login.md) | [`backend/routes/auth.js`](../backend/routes/auth.js) |
-| Security | [08](08-security.md) | [`backend/middleware/`](../backend/middleware) |
-| Frontend / backend | [09](09-frontend-backend.md) | [`frontend/`](../frontend) and [`backend/`](../backend) |
-| APIs | [10](10-apis.md) | [`backend/routes/todos.js`](../backend/routes/todos.js) |
-| Database | [11](11-database.md) | [`backend/db/`](../backend/db) |
+| Requirements | [02](02-requirements.md) | [`lib/validation.js`](../lib/validation.js) |
+| UI | [03](03-ui.md) | [`components/`](../components) |
+| Clicking a URL | [04](04-what-happens-when-you-click.md) | [`lib/api.js`](../lib/api.js) |
+| URL parts | [05](05-url-parts.md) | [`lib/config.js`](../lib/config.js) |
+| HTTP vs HTTPS | [06](06-http-vs-https.md) | [`lib/sessions.js`](../lib/sessions.js) |
+| Login | [07](07-login.md) | [`app/auth/`](../app/auth) |
+| Security | [08](08-security.md) | [`lib/`](../lib), [`proxy.js`](../proxy.js) |
+| Frontend / backend | [09](09-frontend-backend.md) | [`app/`](../app) (`page.js` and `route.js`) |
+| APIs | [10](10-apis.md) | [`app/todos/route.js`](../app/todos/route.js) |
+| Database | [11](11-database.md) | [`lib/db/`](../lib/db) |
 | Writing code | [12](12-writing-code.md) | [`CLAUDE.md`](../CLAUDE.md), [`eslint.config.js`](../eslint.config.js) |
 | Testing | [13](13-testing.md) | [`tests/`](../tests) |
 | Code review | [14](14-code-review.md) | [`bad-examples/`](../bad-examples/README.md) |
@@ -56,7 +56,7 @@ It's like looking at a whole town from a hilltop after exploring every street.
 | Git and PRs | [16](16-git-and-pull-requests.md) | [`.gitignore`](../.gitignore), `git log` |
 | CI/CD | [17](17-ci-cd.md) | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |
 | Cloud and servers | [18](18-cloud-and-servers.md) | [`Dockerfile`](../Dockerfile), [`docker-compose.yml`](../docker-compose.yml) |
-| After deployment | [19](19-after-deployment.md) | [`backend/routes/health.js`](../backend/routes/health.js), [`backend/metrics.js`](../backend/metrics.js) |
+| After deployment | [19](19-after-deployment.md) | [`app/health/route.js`](../app/health/route.js), [`lib/metrics.js`](../lib/metrics.js) |
 | Incidents | [20](20-incident-drill.md) | [`tests/integration/incident.test.js`](../tests/integration/incident.test.js) |
 | Improvement | [21](21-continuous-improvement.md) | your next commit! |
 
@@ -97,7 +97,7 @@ follow its journey through the whole project. Tick each one off:
 
 - [ ] Find the **POST /todos** request and its **X-Request-Id**.
 - [ ] Find the **same ID** in the logs.
-- [ ] Find the line in [`backend/routes/todos.js`](../backend/routes/todos.js) that saved it.
+- [ ] Find the line in [`app/todos/route.js`](../app/todos/route.js) that saved it.
 - [ ] Find your todo in the database with `sqlite3 data/todos.db "SELECT * FROM todos;"`
       (or `docker compose exec app node -e "console.log(require('better-sqlite3')('/app/data/todos.db').prepare('SELECT * FROM todos').all())"` with Docker).
 - [ ] See `todosCreated` go up at http://localhost:3000/metrics.
@@ -107,4 +107,4 @@ Then teach someone else how it works. That's how you know you've really
 got it. 🌟
 
 ---
-[← Lesson 21](21-continuous-improvement.md) · [Back to all lessons](README.md)
+[← Lesson 21](21-continuous-improvement.md) · Bonus: [Lesson 23 · From plain JavaScript to React →](23-from-plain-to-react.md)

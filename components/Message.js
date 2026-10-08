@@ -6,10 +6,10 @@
 //   isGood -> true makes it green
 
 export default function Message({ text, isGood }) {
-  const className = isGood ? 'message is-good' : 'message';
+  const colour = isGood ? 'text-emerald-700' : 'text-rose-700';
   // React shows {text} as plain letters, never as code. Safe!
   return (
-    <p className={className} role="status">
+    <p className={`message min-h-6 py-2 font-bold ${colour}`} role="status">
       {text}
     </p>
   );
