@@ -13,6 +13,7 @@ const nodeGlobals = {
   __dirname: 'readonly',
   Buffer: 'readonly',
   setTimeout: 'readonly',
+  setInterval: 'readonly',
   clearTimeout: 'readonly',
 };
 
@@ -48,6 +49,13 @@ module.exports = [
     languageOptions: {
       sourceType: 'script',
       globals: browserGlobals,
+    },
+  },
+  {
+    // Playwright tests run in Node but also send code into the browser.
+    files: ['tests/e2e/**/*.js'],
+    languageOptions: {
+      globals: { ...nodeGlobals, ...browserGlobals },
     },
   },
 ];

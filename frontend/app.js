@@ -17,9 +17,20 @@
 // A special error we use when the server cannot be reached at all.
 class ServerDownError extends Error {}
 
-// Send a request to our backend and give back its answer.
+// The "secret handshake" token (see backend/middleware/csrf.js).
+// We must show it every time we ask the server to CHANGE something.
+let csrfToken = null;
+
+// Ask the server for a fresh handshake token.
+async function fetchCsrfToken() {
+  const result = await sendRequest('GET', '/auth/csrf');
+  // Remember the token for the next requests.
+  csrfToken = result.data.csrfToken;
+}
+
+// Send ONE request to our backend and give back its answer.
 // method is "GET", "POST", "PUT" or "DELETE". body is optional.
-async function callApi(method, path, body) {
+async function sendRequest(method, path, body) {
   // These are the details we send along with the request.
   const options = {
     method: method,
@@ -30,6 +41,11 @@ async function callApi(method, path, body) {
   if (body !== undefined) {
     options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(body);
+  }
+
+  // Requests that CHANGE things carry the handshake token in a header.
+  if (method !== 'GET' && csrfToken) {
+    options.headers['X-CSRF-Token'] = csrfToken;
   }
 
   let response;
@@ -50,6 +66,31 @@ async function callApi(method, path, body) {
 
   // Give back the status code (like 200 or 400) and the data together.
   return { status: response.status, ok: response.ok, data: data };
+}
+
+// The helper the rest of the page uses to talk to the server.
+// It takes care of the handshake token for us.
+async function callApi(method, path, body) {
+  // Changing something? Make sure we have a handshake token first.
+  if (method !== 'GET' && !csrfToken) {
+    await fetchCsrfToken();
+  }
+
+  let result = await sendRequest(method, path, body);
+
+  // 403 can mean our token went stale (e.g. the server restarted).
+  // Get a fresh one and try ONE more time.
+  if (result.status === 403 && method !== 'GET') {
+    await fetchCsrfToken();
+    result = await sendRequest(method, path, body);
+  }
+
+  // 401 means "not logged in". Send the visitor to the login page.
+  if (result.status === 401 && document.body.dataset.page === 'todos') {
+    window.location.href = '/login.html';
+  }
+
+  return result;
 }
 
 // ---------------------------------------------------------------
@@ -256,30 +297,95 @@ function setUpFilters() {
   }
 }
 
-function startTodosPage() {
+// Check who is logged in and say hello. Returns false if nobody is.
+async function greetUser() {
+  // Ask the server "who am I?"
+  const result = await callApi('GET', '/auth/me');
+  // Not logged in? callApi is already sending us to the login page.
+  if (!result.ok) {
+    return false;
+  }
+  // Put the username in the heading, safely, with textContent.
+  document.getElementById('greeting').textContent = 'Hi, ' + result.data.user.username + '!';
+  return true;
+}
+
+// Log out, then go back to the login page.
+async function logOut() {
+  try {
+    // POST to /auth/logout tells the server to forget our wristband.
+    await callApi('POST', '/auth/logout');
+    // Off to the login page.
+    window.location.href = '/login.html';
+  } catch (error) {
+    if (!(error instanceof ServerDownError)) {
+      throw error;
+    }
+  }
+}
+
+async function startTodosPage() {
   // When the "Add" form is sent, run addTodo.
   document.getElementById('add-todo-form').addEventListener('submit', addTodo);
+  // When "Log out" is clicked, run logOut.
+  document.getElementById('logout-button').addEventListener('click', logOut);
   setUpFilters();
-  // Logging out arrives in a later step of the project.
-  document.getElementById('logout-button').addEventListener('click', () => {
-    showMessage('Logging out is coming soon!');
-  });
-  // Load the list as soon as the page opens.
-  loadTodos();
+
+  try {
+    // Only load the list if someone is logged in.
+    const loggedIn = await greetUser();
+    if (loggedIn) {
+      await loadTodos();
+    }
+  } catch (error) {
+    // Server down? The yellow banner is already showing.
+    if (!(error instanceof ServerDownError)) {
+      throw error;
+    }
+  }
 }
 
 // ---------------------------------------------------------------
 // Part 4: the login page
 // ---------------------------------------------------------------
 
-function startLoginPage() {
-  // Accounts arrive in a later step of the project.
-  for (const id of ['login-form', 'signup-form']) {
-    document.getElementById(id).addEventListener('submit', (event) => {
-      event.preventDefault();
-      showMessage('Accounts are coming soon! For now, go straight to your todos.');
+// Read the username and password from one of the two forms,
+// send them to the server, and go to the todos page if it worked.
+async function sendAccountForm(event, path) {
+  // Stop the browser from reloading the page.
+  event.preventDefault();
+  // The form that was sent (login or signup).
+  const form = event.target;
+
+  try {
+    // POST the username and password to /auth/login or /auth/signup.
+    const result = await callApi('POST', path, {
+      username: form.elements.username.value,
+      password: form.elements.password.value,
     });
+    // Didn't work? Show the server's friendly reason (e.g. wrong password).
+    if (!result.ok) {
+      showMessage(errorFrom(result));
+      return;
+    }
+    // It worked! The server gave us a session cookie. Go to the todos.
+    window.location.href = '/todos.html';
+  } catch (error) {
+    if (!(error instanceof ServerDownError)) {
+      throw error;
+    }
   }
+}
+
+function startLoginPage() {
+  // The "Log in" form sends to /auth/login...
+  document.getElementById('login-form').addEventListener('submit', (event) => {
+    sendAccountForm(event, '/auth/login');
+  });
+  // ...and the "Sign up" form sends to /auth/signup.
+  document.getElementById('signup-form').addEventListener('submit', (event) => {
+    sendAccountForm(event, '/auth/signup');
+  });
 }
 
 // ---------------------------------------------------------------

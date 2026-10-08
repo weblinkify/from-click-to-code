@@ -1,0 +1,54 @@
+// middleware/rate-limit.js
+// "Rate limiting" means: you only get a few tries, then you must wait.
+//
+// Without it, a robot could guess thousands of passwords a minute.
+// With it, after a few wrong guesses the door stays shut for a while.
+// It's like a phone that locks after too many wrong PINs.
+//
+// We remember tries per visitor address (IP) in a simple Map.
+// (A Map lives in memory, so it resets when the server restarts. A big
+// app with many servers would keep this in a shared store instead.)
+
+function createRateLimiter({ maxAttempts, windowMs }) {
+  // address -> { count, resetAt }
+  const attempts = new Map();
+
+  function forgetOldEntries(now) {
+    for (const [address, entry] of attempts) {
+      if (entry.resetAt <= now) {
+        attempts.delete(address);
+      }
+    }
+  }
+
+  return function rateLimitMiddleware(req, res, next) {
+    const now = Date.now();
+    const address = req.ip;
+
+    // Tidy up now and then so the Map doesn't grow forever.
+    if (attempts.size > 1000) {
+      forgetOldEntries(now);
+    }
+
+    let entry = attempts.get(address);
+    if (!entry || entry.resetAt <= now) {
+      entry = { count: 0, resetAt: now + windowMs };
+      attempts.set(address, entry);
+    }
+
+    entry.count = entry.count + 1;
+
+    if (entry.count > maxAttempts) {
+      const secondsToWait = Math.ceil((entry.resetAt - now) / 1000);
+      // Retry-After tells the browser how many seconds to wait.
+      res.set('Retry-After', String(secondsToWait));
+      // 429 means "Too Many Requests: slow down!"
+      return res
+        .status(429)
+        .json({ error: 'Too many tries. Please wait a few minutes and try again.' });
+    }
+    next();
+  };
+}
+
+module.exports = { createRateLimiter };

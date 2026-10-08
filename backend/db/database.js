@@ -3,9 +3,12 @@
 // Every other file asks this one for help, like asking the librarian
 // instead of climbing the shelves yourself.
 //
-// SAFETY RULE: every query uses "?" placeholders (called "parameters").
+// SAFETY RULE 1: every query uses "?" placeholders (called "parameters").
 // We NEVER glue user text into SQL with +. Placeholders keep the user's
 // words as plain data, so they can never be run as commands.
+//
+// SAFETY RULE 2: every todo query includes "user_id = ?", so a person
+// can only ever see or change THEIR OWN todos.
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -23,8 +26,24 @@ function openDatabase(dbPath) {
 
   const db = new Database(dbPath);
   db.pragma('foreign_keys = ON');
+  stopIfDatabaseIsTooOld(db);
   db.exec(fs.readFileSync(SCHEMA_FILE, 'utf8'));
   return db;
+}
+
+// A database made by an early version of this app has todos without owners.
+// Instead of guessing what to do, stop with a clear message.
+function stopIfDatabaseIsTooOld(db) {
+  const columns = db.prepare('PRAGMA table_info(todos)').all();
+  const hasTodosTable = columns.length > 0;
+  const hasOwnerColumn = columns.some((column) => column.name === 'user_id');
+
+  if (hasTodosTable && !hasOwnerColumn) {
+    throw new Error(
+      'This database was made by an older version of the app. ' +
+        'Delete the file (data/todos.db) and start the app again.'
+    );
+  }
 }
 
 // The database stores "completed" as 0 or 1.
@@ -41,29 +60,94 @@ function toTodo(row) {
 function createDatabase(dbPath) {
   const db = openDatabase(dbPath);
 
-  function createTodo(text) {
+  // ---------- users ----------
+
+  // Returns the new user, or null if the username is already taken.
+  function createUser(username, passwordHash) {
+    try {
+      const result = db
+        .prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)')
+        .run(username, passwordHash);
+      return { id: Number(result.lastInsertRowid), username };
+    } catch (error) {
+      if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  // Returns { id, username, passwordHash } or null.
+  function findUserByUsername(username) {
+    const row = db
+      .prepare('SELECT id, username, password_hash FROM users WHERE username = ?')
+      .get(username);
+    if (!row) {
+      return null;
+    }
+    return { id: row.id, username: row.username, passwordHash: row.password_hash };
+  }
+
+  // ---------- sessions ----------
+
+  function createSession(sessionId, userId, expiresAt) {
+    db.prepare('INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)')
+      .run(sessionId, userId, expiresAt);
+  }
+
+  // Returns the user who owns this session, or null if it is unknown or expired.
+  function findUserBySession(sessionId, now) {
+    const row = db
+      .prepare(
+        `SELECT users.id, users.username
+           FROM sessions
+           JOIN users ON users.id = sessions.user_id
+          WHERE sessions.id = ? AND sessions.expires_at > ?`
+      )
+      .get(sessionId, now);
+    if (!row) {
+      return null;
+    }
+    return { id: row.id, username: row.username };
+  }
+
+  function deleteSession(sessionId) {
+    db.prepare('DELETE FROM sessions WHERE id = ?').run(sessionId);
+  }
+
+  function deleteExpiredSessions(now) {
+    db.prepare('DELETE FROM sessions WHERE expires_at <= ?').run(now);
+  }
+
+  // ---------- todos (always for ONE user) ----------
+
+  function createTodo(userId, text) {
     const result = db
-      .prepare('INSERT INTO todos (text) VALUES (?)')
-      .run(text);
-    return findTodo(result.lastInsertRowid);
+      .prepare('INSERT INTO todos (user_id, text) VALUES (?, ?)')
+      .run(userId, text);
+    return findTodo(userId, result.lastInsertRowid);
   }
 
   // completed can be true, false, or undefined (meaning "show all").
-  function listTodos({ completed } = {}) {
+  function listTodos(userId, { completed } = {}) {
     if (completed === undefined) {
-      const rows = db.prepare('SELECT * FROM todos ORDER BY id').all();
+      const rows = db
+        .prepare('SELECT * FROM todos WHERE user_id = ? ORDER BY id')
+        .all(userId);
       return rows.map(toTodo);
     }
 
     const rows = db
-      .prepare('SELECT * FROM todos WHERE completed = ? ORDER BY id')
-      .all(completed ? 1 : 0);
+      .prepare('SELECT * FROM todos WHERE user_id = ? AND completed = ? ORDER BY id')
+      .all(userId, completed ? 1 : 0);
     return rows.map(toTodo);
   }
 
-  // Returns the todo, or null if there is no todo with that id.
-  function findTodo(id) {
-    const row = db.prepare('SELECT * FROM todos WHERE id = ?').get(id);
+  // Returns the todo, or null if this user has no todo with that id.
+  function findTodo(userId, id) {
+    const row = db
+      .prepare('SELECT * FROM todos WHERE id = ? AND user_id = ?')
+      .get(id, userId);
     if (!row) {
       return null;
     }
@@ -71,9 +155,9 @@ function createDatabase(dbPath) {
   }
 
   // changes looks like { text: 'new words' } or { completed: true } or both.
-  // Returns the updated todo, or null if it was not found.
-  function updateTodo(id, changes) {
-    const current = findTodo(id);
+  // Returns the updated todo, or null if this user has no such todo.
+  function updateTodo(userId, id, changes) {
+    const current = findTodo(userId, id);
     if (!current) {
       return null;
     }
@@ -82,14 +166,16 @@ function createDatabase(dbPath) {
     const newCompleted =
       changes.completed !== undefined ? changes.completed : current.completed;
 
-    db.prepare('UPDATE todos SET text = ?, completed = ? WHERE id = ?')
-      .run(newText, newCompleted ? 1 : 0, id);
-    return findTodo(id);
+    db.prepare('UPDATE todos SET text = ?, completed = ? WHERE id = ? AND user_id = ?')
+      .run(newText, newCompleted ? 1 : 0, id, userId);
+    return findTodo(userId, id);
   }
 
   // Returns true if a todo was deleted, false if there was nothing to delete.
-  function deleteTodo(id) {
-    const result = db.prepare('DELETE FROM todos WHERE id = ?').run(id);
+  function deleteTodo(userId, id) {
+    const result = db
+      .prepare('DELETE FROM todos WHERE id = ? AND user_id = ?')
+      .run(id, userId);
     return result.changes === 1;
   }
 
@@ -97,7 +183,20 @@ function createDatabase(dbPath) {
     db.close();
   }
 
-  return { createTodo, listTodos, findTodo, updateTodo, deleteTodo, close };
+  return {
+    createUser,
+    findUserByUsername,
+    createSession,
+    findUserBySession,
+    deleteSession,
+    deleteExpiredSessions,
+    createTodo,
+    listTodos,
+    findTodo,
+    updateTodo,
+    deleteTodo,
+    close,
+  };
 }
 
 module.exports = { createDatabase };

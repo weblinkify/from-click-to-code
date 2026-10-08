@@ -70,8 +70,44 @@ function validateCompletedFilter(input) {
   return { ok: false, error: 'completed must be "true" or "false".' };
 }
 
+// Usernames: 3 to 30 letters, numbers, "_" or "-". No spaces.
+function validateUsername(input) {
+  if (typeof input !== 'string') {
+    return { ok: false, error: 'Please choose a username.' };
+  }
+  const username = input.trim();
+  if (!/^[A-Za-z0-9_-]{3,30}$/.test(username)) {
+    return {
+      ok: false,
+      error: 'Usernames need 3 to 30 letters or numbers (you can also use _ and -).',
+    };
+  }
+  return { ok: true, value: username };
+}
+
+// Passwords: at least 8 characters. We do NOT trim passwords:
+// spaces can be part of a good password!
+// bcrypt only looks at the first 72 bytes, so we stop there.
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_BYTES = 72;
+
+function validatePassword(input) {
+  if (typeof input !== 'string' || input.length < MIN_PASSWORD_LENGTH) {
+    return {
+      ok: false,
+      error: `Passwords need at least ${MIN_PASSWORD_LENGTH} characters.`,
+    };
+  }
+  if (Buffer.byteLength(input, 'utf8') > MAX_PASSWORD_BYTES) {
+    return { ok: false, error: 'That password is too long.' };
+  }
+  return { ok: true, value: input };
+}
+
 module.exports = {
   MAX_TODO_LENGTH,
+  validateUsername,
+  validatePassword,
   validateTodoText,
   validateCompleted,
   validateTodoId,

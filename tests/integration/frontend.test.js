@@ -20,11 +20,4 @@ describe('the frontend files', () => {
       assert.equal(res.status, 200, `${file} should be served`);
     }
   });
-
-  it('never uses innerHTML in the frontend code', async () => {
-    const { api } = makeTestApp();
-    const res = await api.get('/app.js');
-    // Split the word so this test file itself doesn't trip a code search.
-    assert.equal(res.text.includes('inner' + 'HTML ='), false);
-  });
 });

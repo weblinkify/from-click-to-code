@@ -10,6 +10,14 @@
 // Each answer comes with a "status code", a number that says how it went:
 //   200 = OK, here you go        201 = Created something new
 //   400 = Your request was wrong 404 = Couldn't find that
+//
+// Before any of this runs, the guard in require-login.js has already
+// checked your wristband, so req.user tells us WHO is asking.
+//
+// SAFETY: we pass req.user.id to EVERY database call. That way you can
+// only ever see or change your OWN todos. If you ask for someone else's
+// todo, we say 404 "not found", as if it doesn't exist at all, so we
+// don't even reveal that it's there.
 
 const express = require('express');
 const {
@@ -44,8 +52,8 @@ function createTodosRouter(db) {
       return sendBadRequest(res, filter.error);
     }
 
-    // Ask the database for the todos.
-    const todos = db.listTodos({ completed: filter.value });
+    // Ask the database for THIS user's todos only.
+    const todos = db.listTodos(req.user.id, { completed: filter.value });
     // 200 = OK. Send the list back as JSON (a text format computers share).
     res.status(200).json({ todos });
   });
@@ -61,8 +69,9 @@ function createTodosRouter(db) {
       return sendBadRequest(res, text.error);
     }
 
-    // Save it. The database gives back the new todo, with its id.
-    const todo = db.createTodo(text.value);
+    // Save it, labelled with this user's id as the owner.
+    // The database gives back the new todo, with its own id number.
+    const todo = db.createTodo(req.user.id, text.value);
     // 201 = Created. Something new now exists.
     res.status(201).json({ todo });
   });
@@ -102,9 +111,9 @@ function createTodosRouter(db) {
       return sendBadRequest(res, 'Send "text" or "completed" to change a todo.');
     }
 
-    // Ask the database to make the change.
-    const todo = db.updateTodo(id.value, changes);
-    // No todo with that id? That's a 404.
+    // Ask the database to make the change, but only if this user owns it.
+    const todo = db.updateTodo(req.user.id, id.value, changes);
+    // Not found, or not yours? Either way it's a 404.
     if (!todo) {
       return sendNotFound(res);
     }
@@ -119,8 +128,10 @@ function createTodosRouter(db) {
       return sendBadRequest(res, id.error);
     }
 
-    // Ask the database to delete it. It tells us if anything was removed.
-    const deleted = db.deleteTodo(id.value);
+    // Ask the database to delete it, but only if this user owns it.
+    // It tells us whether anything was removed.
+    const deleted = db.deleteTodo(req.user.id, id.value);
+    // Not found, or not yours? Either way it's a 404.
     if (!deleted) {
       return sendNotFound(res);
     }

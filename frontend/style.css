@@ -121,6 +121,11 @@ button:hover,
   gap: 12px;
 }
 
+.greeting {
+  margin: -8px 0 8px;
+  color: var(--muted);
+}
+
 .add-form {
   display: flex;
   gap: 8px;
