@@ -19,6 +19,8 @@ city, street and house number.
 | **Query** | `?completed=true` | *Extra details* | "Please, only the red ones" |
 | **Fragment** | `#top` | A spot *on* the page (never sent to the server) | "Read page 3 first" |
 
+> 🖥️ **Prefer clicking to reading?** With the app running, open the interactive version of this lesson at **http://localhost:3000/course/url.html**.
+
 ## Our app's URLs
 
 When you run the app on your computer:

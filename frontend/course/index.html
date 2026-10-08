@@ -1,0 +1,52 @@
+<!doctype html>
+<!--
+  course/index.html is the home page of the in-browser course.
+  The interactive lessons live right inside the app, so they can
+  talk to the real server while you learn.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Course · Kids Todo App</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/course/course.css">
+  <script src="/course/course.js" defer></script>
+</head>
+<body data-page="course-home">
+  <main class="card course">
+    <p><a href="/">← Back to the app</a></p>
+    <h1>📚 How the web works</h1>
+    <p class="lead">
+      Short lessons you can <b>play with</b>. Each one uses this very app, which is
+      running on your computer right now!
+    </p>
+
+    <ol class="lesson-list">
+      <li>
+        <a class="lesson-link" href="/course/url.html">
+          <span class="lesson-number">5</span>
+          <span>
+            <b>The parts of a URL 🔗</b><br>
+            <span class="muted">Read a web address like a postal address</span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="lesson-link" href="/course/https.html">
+          <span class="lesson-number">6</span>
+          <span>
+            <b>HTTP and HTTPS ✉️🔒</b><br>
+            <span class="muted">Postcards vs sealed envelopes</span>
+          </span>
+        </a>
+      </li>
+    </ol>
+
+    <p class="muted">
+      Before you start: <a href="/login.html">make an account</a> and add two or
+      three todos, then tick one off. Some experiments use your list!
+    </p>
+  </main>
+</body>
+</html>

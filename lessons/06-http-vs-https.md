@@ -7,6 +7,8 @@ you write the address on the front and sign your name at the end.
 **HTTPS** is the same language with an **S for Secure**: everything is
 **encrypted** (scrambled) so nobody in the middle can read it.
 
+> 🖥️ **Prefer clicking to reading?** With the app running, open the interactive version of this lesson at **http://localhost:3000/course/https.html**.
+
 ## Postcard vs sealed envelope
 
 ```

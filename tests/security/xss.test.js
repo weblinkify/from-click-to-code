@@ -25,10 +25,12 @@ describe('script tags in todos', () => {
   });
 
   it('the frontend never puts text on the page with innerHTML', () => {
-    const appJs = fs.readFileSync(path.join(__dirname, '../../frontend/app.js'), 'utf8');
-    const codeWithoutComments = appJs.replace(/\/\/.*$/gm, '');
-    assert.equal(codeWithoutComments.includes('innerHTML'), false);
-    assert.equal(codeWithoutComments.includes('insertAdjacentHTML'), false);
-    assert.equal(codeWithoutComments.includes('document.write'), false);
+    for (const file of ['frontend/app.js', 'frontend/course/course.js']) {
+      const code = fs.readFileSync(path.join(__dirname, '../..', file), 'utf8');
+      const codeWithoutComments = code.replace(/\/\/.*$/gm, '');
+      assert.equal(codeWithoutComments.includes('innerHTML'), false, file);
+      assert.equal(codeWithoutComments.includes('insertAdjacentHTML'), false, file);
+      assert.equal(codeWithoutComments.includes('document.write'), false, file);
+    }
   });
 });

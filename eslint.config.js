@@ -23,6 +23,10 @@ const browserGlobals = {
   document: 'readonly',
   fetch: 'readonly',
   console: 'readonly',
+  Headers: 'readonly',
+  URLSearchParams: 'readonly',
+  TextEncoder: 'readonly',
+  TextDecoder: 'readonly',
 };
 
 module.exports = [

@@ -1,0 +1,261 @@
+/*
+  course.css adds the styles used only by the course pages.
+  The basic look (colours, buttons, cards) comes from /style.css.
+*/
+
+.course {
+  max-width: 760px;
+}
+
+.kicker {
+  margin: 0;
+  color: var(--primary);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+code,
+pre {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+code {
+  padding: 1px 6px;
+  background: #f2eee3;
+  border-radius: 6px;
+}
+
+pre {
+  max-height: 260px;
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #2d2a32;
+  color: #f5f1e6;
+  border-radius: 10px;
+}
+
+.experiment {
+  margin: 28px 0;
+  padding: 20px;
+  background: #fffdf7;
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+}
+
+.experiment h2 {
+  margin-top: 0;
+}
+
+.challenge {
+  background: #eef2ff;
+  border-style: solid;
+  border-color: #c9d5ff;
+}
+
+.button-row,
+.try-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 16px;
+}
+
+.button-row button,
+.try-list button,
+.quiz button {
+  margin-top: 0;
+}
+
+.try {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+.answer-box {
+  padding: 12px 16px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+}
+
+.answer-box p {
+  margin: 6px 0;
+}
+
+/* ---------- the coloured URL ---------- */
+
+.url-colored {
+  min-height: 2.2em;
+  padding: 12px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+}
+
+.part-scheme { color: #b03a8c; font-weight: bold; }
+.part-host { color: #2a53c4; font-weight: bold; }
+.part-port { color: #c46a00; font-weight: bold; }
+.part-path { color: #2e7d4f; font-weight: bold; }
+.part-query { color: #7b4bd6; font-weight: bold; }
+.part-fragment { color: #c43a3a; font-weight: bold; }
+.part-plain { color: var(--muted); }
+
+.parts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.parts-table th,
+.parts-table td {
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+  overflow-wrap: break-word;
+}
+
+/* Keep part names like "Scheme" on one line. */
+.parts-table td:first-child,
+.parts-table th:first-child {
+  white-space: nowrap;
+}
+
+/* Header names are long, so let them break at the dashes instead. */
+#header-list td:first-child {
+  white-space: normal;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85em;
+}
+
+.parts-table td:nth-child(2) {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* ---------- postcard and envelope ---------- */
+
+.two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.mail {
+  padding: 14px;
+  border-radius: 12px;
+}
+
+.mail h3 {
+  margin-top: 0;
+}
+
+.postcard {
+  background: #fff3c4;
+  border: 2px solid #e8c547;
+}
+
+.envelope {
+  background: #e7f6ec;
+  border: 2px solid #8fd1a6;
+}
+
+.mail-text {
+  min-height: 1.5em;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+.scrambled {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  font-weight: normal;
+}
+
+/* ---------- quiz ---------- */
+
+.quiz {
+  margin-bottom: 18px;
+}
+
+.quiz button {
+  margin: 0 6px 6px 0;
+}
+
+.quiz button.is-right {
+  color: #fff;
+  background: var(--success);
+}
+
+.quiz button.is-wrong {
+  color: #fff;
+  background: var(--danger);
+}
+
+.quiz-feedback {
+  min-height: 1.5em;
+  font-weight: bold;
+}
+
+/* ---------- lesson list and navigation ---------- */
+
+.lesson-list {
+  padding: 0;
+  list-style: none;
+}
+
+.lesson-link {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 14px;
+  color: var(--text);
+  text-decoration: none;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+}
+
+.lesson-link:hover {
+  border-color: var(--primary);
+}
+
+.lesson-number {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  font-weight: bold;
+  color: #fff;
+  background: var(--primary);
+  border-radius: 50%;
+}
+
+.lesson-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+@media (max-width: 600px) {
+  .two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .experiment {
+    padding: 14px;
+  }
+}

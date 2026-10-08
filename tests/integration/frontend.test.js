@@ -13,9 +13,13 @@ describe('the frontend files', () => {
     assert.match(res.text, /Kids Todo App/);
   });
 
-  it('serves the login page, todos page, script and styles', async () => {
+  it('serves the login page, todos page, course pages, scripts and styles', async () => {
     const { api } = makeTestApp();
-    for (const file of ['/login.html', '/todos.html', '/app.js', '/style.css']) {
+    const files = [
+      '/login.html', '/todos.html', '/app.js', '/style.css',
+      '/course/', '/course/url.html', '/course/https.html', '/course/course.js', '/course/course.css',
+    ];
+    for (const file of files) {
       const res = await api.get(file);
       assert.equal(res.status, 200, `${file} should be served`);
     }
