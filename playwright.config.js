@@ -20,16 +20,17 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  // Start our real app before the tests, with a fresh in-memory database.
+  // Build the app and start it before the tests, with a fresh in-memory database.
   webServer: {
-    command: 'node backend/server.js',
-    url: `http://localhost:${PORT}/`,
+    command: `npm run build && npx next start --port ${PORT}`,
+    url: `http://localhost:${PORT}/health`,
+    timeout: 180 * 1000,
     reuseExistingServer: false,
     env: {
-      PORT: String(PORT),
       DB_PATH: ':memory:',
       SESSION_SECRET: 'e2e-test-secret',
       BCRYPT_ROUNDS: '4',
+      LOGIN_MAX_ATTEMPTS: '50',
     },
   },
 });

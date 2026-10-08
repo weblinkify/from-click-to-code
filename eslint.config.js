@@ -18,6 +18,7 @@ const nodeGlobals = {
   setInterval: 'readonly',
   clearInterval: 'readonly',
   structuredClone: 'readonly',
+  crypto: 'readonly',
 };
 
 // Names that the web browser gives frontend files for free.

@@ -1,6 +1,8 @@
 /*
-  style.css decides how things LOOK: colours, sizes and spacing.
-  HTML is the skeleton, CSS is the clothes, JavaScript is the muscles.
+  globals.css decides how things LOOK: colours, sizes and spacing.
+  It is loaded once, in app/layout.js, for every page.
+  HTML (here: React components) is the skeleton, CSS is the clothes,
+  JavaScript is the muscles.
 */
 
 /* Colours we reuse, given friendly names. */

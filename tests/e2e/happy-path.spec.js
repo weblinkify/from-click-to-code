@@ -11,11 +11,11 @@ function newUsername() {
 const PASSWORD = 'sunflower-42';
 
 async function signUp(page, username) {
-  await page.goto('/login.html');
+  await page.goto('/login');
   await page.getByLabel('Pick a username').fill(username);
   await page.getByLabel('Pick a password').fill(PASSWORD);
   await page.getByRole('button', { name: 'Sign up' }).click();
-  await expect(page).toHaveURL(/todos\.html/);
+  await expect(page).toHaveURL(/my-todos/);
 }
 
 test('a kid can sign up, log in, add a todo, complete it and delete it', async ({ page }) => {
@@ -25,13 +25,13 @@ test('a kid can sign up, log in, add a todo, complete it and delete it', async (
   await signUp(page, username);
   await expect(page.getByText(`Hi, ${username}!`)).toBeVisible();
   await page.getByRole('button', { name: 'Log out' }).click();
-  await expect(page).toHaveURL(/login\.html/);
+  await expect(page).toHaveURL(/login/);
 
   // 2. Log in again with the same username and password.
   await page.getByLabel('Username', { exact: true }).fill(username);
   await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
-  await expect(page).toHaveURL(/todos\.html/);
+  await expect(page).toHaveURL(/my-todos/);
 
   // 3. Add a todo.
   await page.getByPlaceholder('What do you want to do?').fill('Feed the cat');
@@ -50,12 +50,12 @@ test('a kid can sign up, log in, add a todo, complete it and delete it', async (
 });
 
 test('the todos page sends logged-out visitors to the login page', async ({ page }) => {
-  await page.goto('/todos.html');
-  await expect(page).toHaveURL(/login\.html/);
+  await page.goto('/my-todos');
+  await expect(page).toHaveURL(/login/);
 });
 
 test('a wrong password shows a friendly message', async ({ page }) => {
-  await page.goto('/login.html');
+  await page.goto('/login');
   await page.getByLabel('Username', { exact: true }).fill('nobody-here');
   await page.getByLabel('Password', { exact: true }).fill('not-the-password');
   await page.getByRole('button', { name: 'Log in' }).click();
