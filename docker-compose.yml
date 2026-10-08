@@ -25,6 +25,10 @@ services:
     # These settings win over anything in .env.
     environment:
       NODE_ENV: production
+      # Inside the container the app always uses door 3000.
+      # To use a different door on YOUR computer, change the left side
+      # of the "ports" line above, e.g. "3001:3000".
+      PORT: 3000
       DB_PATH: /app/data/todos.db
       # We visit http://localhost (plain HTTP, no padlock), and some browsers
       # throw away "Secure" cookies on plain HTTP. On a real server with

@@ -27,7 +27,7 @@ real web app is built. Clarity beats cleverness every time.
 ## Tests
 - Test names read like sentences a child understands ("rejects an empty todo").
 - Each test builds a fresh app with `makeTestApp()` from `tests/helpers/test-app.js`.
-- Run `npm run lint && npm test` before every commit.
+- Run `npm run lint && npm test` before every commit (and `npm run check:links` after editing lessons).
 
 ## Git
 - Use one commit per finished step, with a clear message saying *what* and *why*.

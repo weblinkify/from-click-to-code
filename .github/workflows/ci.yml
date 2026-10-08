@@ -53,6 +53,9 @@ jobs:
       - name: Security tests
         run: npm run test:security
 
+      - name: Check every lesson links to real files
+        run: npm run check:links
+
       - name: Check libraries for known security holes
         run: npm audit --audit-level=high
 

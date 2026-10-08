@@ -16,7 +16,8 @@
     "test:integration": "node --test \"tests/integration/**/*.test.js\"",
     "test:security": "node --test \"tests/security/**/*.test.js\"",
     "test:e2e": "playwright test",
-    "test": "npm run test:unit && npm run test:integration && npm run test:security"
+    "test": "npm run test:unit && npm run test:integration && npm run test:security",
+    "check:links": "node scripts/check-links.js"
   },
   "repository": {
     "type": "git",
