@@ -39,7 +39,7 @@ function sendNotFound(res) {
   res.status(404).json({ error: 'Todo not found.' });
 }
 
-function createTodosRouter(db) {
+function createTodosRouter(db, metrics) {
   // A "router" is a mini-app that only handles URLs starting with /todos.
   const router = express.Router();
 
@@ -72,6 +72,8 @@ function createTodosRouter(db) {
     // Save it, labelled with this user's id as the owner.
     // The database gives back the new todo, with its own id number.
     const todo = db.createTodo(req.user.id, text.value);
+    // Add one to the "todos created" counter on our dashboard (/metrics).
+    metrics.increment('todosCreated');
     // 201 = Created. Something new now exists.
     res.status(201).json({ todo });
   });

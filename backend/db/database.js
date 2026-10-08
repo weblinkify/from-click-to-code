@@ -9,6 +9,10 @@
 //
 // SAFETY RULE 2: every todo query includes "user_id = ?", so a person
 // can only ever see or change THEIR OWN todos.
+//
+// INCIDENT DRILL: start the app with BREAK_DATABASE=true and every
+// database call fails on purpose, so we can practise fixing an outage.
+// See lessons/20-incident-drill.md.
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -57,8 +61,39 @@ function toTodo(row) {
   };
 }
 
-function createDatabase(dbPath) {
+// Called first by every database function. When the drill switch is on,
+// it pretends the database has gone away.
+function checkDatabaseIsWorking(isBroken) {
+  if (isBroken) {
+    throw new Error(
+      'SQLITE_CANTOPEN: unable to open database file ' +
+        '(simulated outage because BREAK_DATABASE=true)'
+    );
+  }
+}
+
+// Wrap each function so it runs checkDatabaseIsWorking first.
+// Writing it once here is safer than remembering it in 12 places.
+function withOutageCheck(functions, isBroken) {
+  const checked = {};
+  for (const [name, fn] of Object.entries(functions)) {
+    checked[name] = (...args) => {
+      checkDatabaseIsWorking(isBroken);
+      return fn(...args);
+    };
+  }
+  return checked;
+}
+
+function createDatabase(dbPath, { breakDatabase = false } = {}) {
   const db = openDatabase(dbPath);
+
+  // ---------- health ----------
+
+  // Asks the database the smallest possible question. Throws if it can't answer.
+  function checkHealth() {
+    db.prepare('SELECT 1').get();
+  }
 
   // ---------- users ----------
 
@@ -183,7 +218,8 @@ function createDatabase(dbPath) {
     db.close();
   }
 
-  return {
+  return withOutageCheck({
+    checkHealth,
     createUser,
     findUserByUsername,
     createSession,
@@ -196,7 +232,7 @@ function createDatabase(dbPath) {
     updateTodo,
     deleteTodo,
     close,
-  };
+  }, breakDatabase);
 }
 
 module.exports = { createDatabase };

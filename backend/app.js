@@ -9,8 +9,10 @@
 //   request
 //     |
 //     v
+//   request logger             -> gives the request an ID, logs when done
 //   security headers (helmet)  -> adds safety instructions to every answer
 //   frontend files             -> HTML, CSS and JS for the browser
+//   /health and /metrics       -> "am I alive?" and "how am I doing?"
 //   read JSON body             -> turns the request's JSON into req.body
 //   read cookies               -> turns the Cookie header into req.cookies
 //   load session               -> works out WHO is asking (req.user)
@@ -23,13 +25,18 @@ const path = require('node:path');
 const express = require('express');
 const helmet = require('helmet');
 const { readConfig } = require('./config');
+const { createLogger } = require('./logger');
+const { createMetrics } = require('./metrics');
 const { createAuthRouter } = require('./routes/auth');
 const { createTodosRouter } = require('./routes/todos');
+const { createHealthRouter } = require('./routes/health');
+const { createMetricsRouter } = require('./routes/metrics');
+const { requestLogger } = require('./middleware/request-logger');
 const { readCookies } = require('./middleware/cookies');
 const { loadSession } = require('./middleware/sessions');
 const { csrfProtection } = require('./middleware/csrf');
 const { requireLogin } = require('./middleware/require-login');
-const { notFound, errorHandler } = require('./middleware/error-handler');
+const { notFound, createErrorHandler } = require('./middleware/error-handler');
 
 // The folder holding index.html, app.js and style.css.
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
@@ -54,18 +61,27 @@ function securityHeaders(config) {
   });
 }
 
-function createApp({ db, config = readConfig() }) {
+function createApp({
+  db,
+  config = readConfig(),
+  logger = createLogger(),
+  metrics = createMetrics(),
+}) {
   const app = express();
 
   // Behind a cloud "front desk" server, trust it to tell us the visitor's
   // real address (needed so rate limiting counts each visitor separately).
   app.set('trust proxy', config.trustProxy);
 
+  app.use(requestLogger(logger, metrics));
   app.use(securityHeaders(config));
 
   // Send the frontend files (HTML, CSS, JS) to the browser as they are.
   // Visiting "/" gives you index.html.
   app.use(express.static(FRONTEND_DIR));
+
+  app.use('/health', createHealthRouter(db, logger));
+  app.use('/metrics', createMetricsRouter(metrics));
 
   // Turn the JSON text in a request into a JavaScript object (req.body).
   // The limit stops someone sending us a giant package.
@@ -75,11 +91,11 @@ function createApp({ db, config = readConfig() }) {
   app.use(loadSession(db));
   app.use(csrfProtection(config));
 
-  app.use('/auth', createAuthRouter(db, config));
-  app.use('/todos', requireLogin, createTodosRouter(db));
+  app.use('/auth', createAuthRouter(db, config, metrics));
+  app.use('/todos', requireLogin, createTodosRouter(db, metrics));
 
   app.use(notFound);
-  app.use(errorHandler);
+  app.use(createErrorHandler(logger));
 
   return app;
 }

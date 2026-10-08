@@ -29,7 +29,7 @@ function publicUser(user) {
   return { id: user.id, username: user.username };
 }
 
-function createAuthRouter(db, config) {
+function createAuthRouter(db, config, metrics) {
   const router = express.Router();
 
   // Used when the username doesn't exist, so a wrong username takes as
@@ -82,6 +82,8 @@ function createAuthRouter(db, config) {
     const passwordMatches = await bcrypt.compare(password, hashToCheck);
 
     if (!user || !passwordMatches) {
+      // Lots of failed logins can mean someone is guessing. Count them.
+      metrics.increment('loginsFailed');
       return res.status(401).json({ error: WRONG_LOGIN });
     }
 

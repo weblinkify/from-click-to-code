@@ -58,6 +58,9 @@ function readConfig(env = process.env) {
     // Set to true when the app sits behind a "reverse proxy" (a front desk
     // server in the cloud), so we can see each visitor's real address.
     trustProxy: readBoolean(env.TRUST_PROXY, false),
+
+    // INCIDENT DRILL switch: true makes every database call fail on purpose.
+    breakDatabase: readBoolean(env.BREAK_DATABASE, false),
   };
 }
 

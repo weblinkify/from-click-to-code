@@ -7,6 +7,8 @@ const request = require('supertest');
 const { createDatabase } = require('../../backend/db/database');
 const { createApp } = require('../../backend/app');
 const { readConfig } = require('../../backend/config');
+const { createLogger } = require('../../backend/logger');
+const { createMetrics } = require('../../backend/metrics');
 
 const TEST_PASSWORD = 'correct-horse-battery';
 
@@ -20,11 +22,16 @@ function testConfig(overrides = {}) {
   };
 }
 
+// Log lines are caught in the "logs" list instead of filling the screen,
+// so tests can read them.
 function makeTestApp(configOverrides) {
-  const db = createDatabase(':memory:');
   const config = testConfig(configOverrides);
-  const app = createApp({ db, config });
-  return { app, db, config, api: request(app) };
+  const db = createDatabase(':memory:', { breakDatabase: config.breakDatabase });
+  const logs = [];
+  const logger = createLogger({ write: (line) => logs.push(JSON.parse(line)) });
+  const metrics = createMetrics();
+  const app = createApp({ db, config, logger, metrics });
+  return { app, db, config, logs, metrics, api: request(app) };
 }
 
 // A pretend browser: it keeps cookies between requests (like a real one)

@@ -128,7 +128,13 @@ function showMessage(text, isGood) {
 // Pick a friendly message out of a server answer.
 function errorFrom(result) {
   // The server puts its message in "error". If it didn't, use our own.
-  return result.data.error || 'Oops, something went wrong. Please try again.';
+  const message = result.data.error || 'Oops, something went wrong. Please try again.';
+  // When the server had a problem, it also sends a request ID. We show
+  // the start of it as a "help code" so grown-ups can find it in the logs.
+  if (result.data.requestId) {
+    return message + ' (Help code: ' + result.data.requestId.slice(0, 8) + ')';
+  }
+  return message;
 }
 
 // ---------------------------------------------------------------
@@ -302,7 +308,12 @@ async function greetUser() {
   // Ask the server "who am I?"
   const result = await callApi('GET', '/auth/me');
   // Not logged in? callApi is already sending us to the login page.
+  if (result.status === 401) {
+    return false;
+  }
+  // Some other problem (like a 500)? Show the friendly message.
   if (!result.ok) {
+    showMessage(errorFrom(result));
     return false;
   }
   // Put the username in the heading, safely, with textContent.
